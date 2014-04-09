@@ -82,7 +82,24 @@ public class Column {
 		c.setOrdinalPosition(rs.getInt(17));
 		c.setIsAutoincrement("NO");
 		
+		// bug en SQLDroid
+		if (c.getTypeName().equals("BIT(1)")) {
+			c.setDataType(java.sql.Types.BIT);
+		}
+		else if (c.getTypeName().equals("BIGINT")) {
+			c.setDataType(java.sql.Types.BIGINT);
+		}
+		
 		return c;
+	}
+
+	@Override
+	public String toString() {
+		return "Column [_column_name=" + _column_name + ", _data_type="
+				+ _data_type + ", _type_name=" + _type_name + ", _nullable="
+				+ _nullable + ", _column_def=" + _column_def
+				+ ", _ordinal_position=" + _ordinal_position
+				+ ", _is_autoincrement=" + _is_autoincrement + "]";
 	}
 	
 }
