@@ -14,6 +14,8 @@ import java.util.Map;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.log4j.Logger;
 import org.ini4j.Wini;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * 
@@ -203,6 +205,8 @@ public class SQLiteORM {
 					"import java.sql.Statement;\n" +
 					"import java.util.AbstractMap;\n" +
 					"import java.util.ArrayList;\n" +
+					"import org.w3c.dom.Element;\n" +
+					"import org.w3c.dom.Node;\n" +
 					"\n" +
 					"/**\n" +
 					" * @author petete-ntbk\n" +
@@ -842,8 +846,11 @@ public class SQLiteORM {
     	        	"\n" +
     	        	"        try {\n" +
     	        	"            stmt = p_conn.createStatement();\n" +
-    	        	"            \n" +
+    	        	"\n" +
     	        	"            ret = stmt.executeUpdate(str_sql);\n" +
+    	        	"\n" +
+    	        	"            load(p_conn);\n" +
+    	        	"\n" +
     	        	"            /*\n" +
     	        	"            if (stmt.executeUpdate(str_sql) < 1) {\n" +
     	        	"                throw new Exception(\"No hubo filas afectadas\");\n" +
@@ -1417,6 +1424,118 @@ public class SQLiteORM {
     	            "\n";
 
     	        // fin toJSON
+
+        	    // toXML
+        	    
+    	        output +=
+    	        	"\n" +
+    	            "    public String toXML() {\n" +
+    	            "        return \"<" + className + ">\" +";
+    	        
+        	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
+        	    	
+        	        String columnName = entry.getKey();
+        	        Column column = entry.getValue();
+        	        
+        	        String memberName = toJavaFieldName(columnName);
+        	                	        
+        	        output += "\n	           \"    <";
+        	        
+        	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+        	        	output += "id";
+        	        }
+        	        else {
+        	        	output += memberName;
+        	        }
+        	        
+        	        output += "\" + (_";
+        	        
+        	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+        	        	output += "id";
+        	        }
+        	        else {
+        	        	output += memberName;
+        	        }
+        	        
+        	        output += " != null ? \">\" + _";
+        	        
+        	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+        	        	output += "id";
+        	        }
+        	        else {
+        	        	output += memberName;
+        	        }
+        	        
+        	        output += " + \"</";
+        	        		
+        	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+        	        	output += "id";
+        	        }
+        	        else {
+        	        	output += memberName;
+        	        }
+        	        		
+        	        output += ">\" : \" xsi:nil=\\\"true\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\"/>\")" + " +";
+	            	        
+        	        
+        	    }
+    	        
+    	        output +=
+    	            "\n			   \"</" + className + ">\";" +
+    	            "\n" +
+    	            "    }\n" +
+    	            "\n";
+
+    	        // fin toXML
+    	        
+        	    // fromXMLNode
+        	    
+        	    output +=
+        	    	"\n" +
+					"    public static " + className + " fromXMLNode(Node xmlNode) {\n" +
+		            "        " + className + " ret = new " + className + "();\n\n" +
+					"        Element element = (Element) xmlNode;\n\n";
+
+        	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
+        	    	
+        	        String columnName = entry.getKey();
+        	        Column column = entry.getValue();
+        	        
+        	        String memberName = toJavaFieldName(columnName);
+        	        
+        	        output += 
+        	        	"        ret.set"; 
+        	        
+        	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+        	        	output += "Id";
+        	        }
+        	        else {
+        	        	output += WordUtils.capitalize(memberName);
+        	        }
+        	        
+        	        output += "(";
+        	        
+        	        if (mapFunctionTypes.get(column.getDataType()).equals("String") ) {
+        	        	output += "element.getElementsByTagName(\"" + columnName + "\").item(0).getTextContent()";
+        	        }
+        	        else {
+        	        	output += mapJavaTypes.get(column.getDataType()) + ".decode(element.getElementsByTagName(\"" + columnName + "\").item(0).getTextContent())";
+        	        }
+
+        	        output += 
+        	        	");\n";
+
+        	    }
+        	    
+        	    output +=
+                    "\n" +			
+		            "        return ret;\n" +
+		            "    }\n";
+
+        	           	    
+        	    // fin fromXMLNode
+    	        
+    	        
     	        
     	        // fin clase
     	        
