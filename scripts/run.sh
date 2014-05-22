@@ -4,7 +4,7 @@
 PROGRAM_PATH=`dirname $0`
 
 #JAVA_HOME=/opt/jdk1.6.0_38/
-JAVA_HOME=/opt/jdk1.6.0_27
+JAVA_HOME=/opt/jdk1.7.0_45
 TMP_DIR=/var/tmp
 CLASSPATH=\
 $JAVA_HOME/lib/tools.jar:
@@ -14,7 +14,7 @@ $PROGRAM_PATH/../bin/SQLiteORM.jar
 # seteando el classpath
 . $PROGRAM_PATH/env.sh
 
-echo $CLASSPATH
+# echo $CLASSPATH
 #
 # Start program
 #
@@ -26,7 +26,7 @@ $JAVA_HOME/bin/java \
 -Dconfig_file=$PROGRAM_PATH/../etc/config.ini \
 -Ddata_file=$PROGRAM_PATH/../data/car.db3 \
 -Doutput_dir=$PROGRAM_PATH/../output \
--cp `cygpath -wp $CLASSPATH` \
+-cp $CLASSPATH \
 SQLiteORM
 
 #$JAVACMD LoadCaf $@

@@ -53,8 +53,8 @@ public class SQLiteORM {
 		Map<String, Column> mapColumns;
 		Map<String, PrimaryKey> mapPrimaryKeys;
 		Map<String, ForeignKey> mapForeignKeys;
-		Map<Integer, String> mapJavaTypes;
-		Map<Integer, String> mapFunctionTypes;
+		Map<String, String> mapJavaTypes;
+		Map<String, String> mapFunctionTypes;
 		
 		ResultSet rsColumns;
 		ResultSet rsPrimaryKeys;
@@ -96,42 +96,48 @@ public class SQLiteORM {
     		catalog          = null;
     		schemaPattern    = null;
     		tableNamePattern = null;
-    		types            = null;
+    		types            = new String[1];
+    		
+    		types[0] = "TABLE";
     		
     		mapColumns = new HashMap<String, Column>();
     		mapPrimaryKeys = new HashMap<String, PrimaryKey>();
     		mapForeignKeys = new HashMap<String, ForeignKey>();
-    		mapJavaTypes = new HashMap<Integer, String>();
-    		mapFunctionTypes = new HashMap<Integer, String>();
+    		mapJavaTypes = new HashMap<String, String>();
+    		mapFunctionTypes = new HashMap<String, String>();
     		
-    		mapJavaTypes.put(java.sql.Types.BIGINT, "Long");
-    		mapJavaTypes.put(java.sql.Types.INTEGER, "Integer");
-    		mapJavaTypes.put(java.sql.Types.SMALLINT, "Short");
-    		mapJavaTypes.put(java.sql.Types.TINYINT, "Byte");
-    		mapJavaTypes.put(java.sql.Types.CHAR, "String");
-    		mapJavaTypes.put(java.sql.Types.VARCHAR, "String");
-    		mapJavaTypes.put(java.sql.Types.LONGVARCHAR, "String");
-    		mapJavaTypes.put(java.sql.Types.DATE, "String");
-    		mapJavaTypes.put(java.sql.Types.TIMESTAMP, "String");
-    		mapJavaTypes.put(java.sql.Types.BIT, "Byte");
-    		mapJavaTypes.put(java.sql.Types.DECIMAL, "Decimal");
-    		mapJavaTypes.put(java.sql.Types.DOUBLE, "Double");
-    		mapJavaTypes.put(java.sql.Types.FLOAT, "Float");
+    		mapJavaTypes.put("BIGINT", "Long");
+    		mapJavaTypes.put("INT", "Integer");
+    		mapJavaTypes.put("SMALLINT", "Short");
+    		mapJavaTypes.put("TINYINT", "Byte");
+    		mapJavaTypes.put("CHAR", "String");
+    		mapJavaTypes.put("VARCHAR", "String");
+    		mapJavaTypes.put("LONGVARCHAR", "String");
+    		mapJavaTypes.put("TEXT", "String");
+    		mapJavaTypes.put("DATE", "String");
+    		mapJavaTypes.put("DATETIME", "String");
+    		mapJavaTypes.put("TIMESTAMP", "String");
+    		mapJavaTypes.put("BIT", "Boolean");
+    		mapJavaTypes.put("DECIMAL", "Decimal");
+    		mapJavaTypes.put("DOUBLE", "Double");
+    		mapJavaTypes.put("FLOAT", "Float");
     		
     		// para RecordSet.get<type>()
-    		mapFunctionTypes.put(java.sql.Types.BIGINT, "Long");
-    		mapFunctionTypes.put(java.sql.Types.INTEGER, "Int");
-    		mapFunctionTypes.put(java.sql.Types.SMALLINT, "Short");
-    		mapFunctionTypes.put(java.sql.Types.TINYINT, "Byte");
-    		mapFunctionTypes.put(java.sql.Types.CHAR, "String");
-    		mapFunctionTypes.put(java.sql.Types.VARCHAR, "String");
-    		mapFunctionTypes.put(java.sql.Types.LONGVARCHAR, "String");
-    		mapFunctionTypes.put(java.sql.Types.DATE, "String");
-    		mapFunctionTypes.put(java.sql.Types.TIMESTAMP, "String");
-    		mapFunctionTypes.put(java.sql.Types.BIT, "Byte");
-    		mapFunctionTypes.put(java.sql.Types.DECIMAL, "Decimal");
-    		mapFunctionTypes.put(java.sql.Types.DOUBLE, "Double");
-    		mapFunctionTypes.put(java.sql.Types.FLOAT, "Float");
+    		mapFunctionTypes.put("BIGINT", "Long");
+    		mapFunctionTypes.put("INT", "Int");
+    		mapFunctionTypes.put("SMALLINT", "Short");
+    		mapFunctionTypes.put("TINYINT", "Byte");
+    		mapFunctionTypes.put("CHAR", "String");
+    		mapFunctionTypes.put("VARCHAR", "String");
+    		mapFunctionTypes.put("LONGVARCHAR", "String");
+    		mapFunctionTypes.put("TEXT", "String");
+    		mapFunctionTypes.put("DATE", "String");
+    		mapFunctionTypes.put("DATETIME", "String");
+    		mapFunctionTypes.put("TIMESTAMP", "String");
+    		mapFunctionTypes.put("BIT", "Boolean");
+    		mapFunctionTypes.put("DECIMAL", "Decimal");
+    		mapFunctionTypes.put("DOUBLE", "Double");
+    		mapFunctionTypes.put("FLOAT", "Float");
         	
         	rs = databaseMetaData.getTables(catalog, schemaPattern, tableNamePattern, types );
 
@@ -197,7 +203,7 @@ public class SQLiteORM {
 	        	    "/**\n" +
 	           	    " * \n" +
 	                " */\n" +
-	           	    "package bd;\n" +
+	           	    "package cl.dsoft.sqlite.db;\n" +
 	           	    "\n" +
 					"import java.sql.Connection;\n" +
 					"import java.sql.ResultSet;\n" +
@@ -205,13 +211,17 @@ public class SQLiteORM {
 					"import java.sql.Statement;\n" +
 					"import java.util.AbstractMap;\n" +
 					"import java.util.ArrayList;\n" +
-					"import org.w3c.dom.Element;\n" +
-					"import org.w3c.dom.Node;\n" +
+					"//import org.w3c.dom.Element;\n" +
+					"//import org.w3c.dom.Node;\n" +
+					"\n" +
+					"import org.simpleframework.xml.Element;\n" +
+					"import org.simpleframework.xml.Root;\n" +
 					"\n" +
 					"/**\n" +
 					" * @author petete-ntbk\n" +
 					" *\n" +
 					" */\n" +
+					"@Root\n" +
 					"public class " + className + " {\n";
         	    
         	    // declaraciones
@@ -221,15 +231,30 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
+        	        output += "    @Element(name = \"";
         	        
-        	        output += "    private " + mapJavaTypes.get(column.getDataType()) + " _";
+        	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+        	        	output += "id";
+        	        }
+        	        else {
+        	        	output += column.getMemberName();
+        	        }
+        	        
+        	        output += "\"";
+        	        
+        	        if (column.getNullable() == 1) {
+        	        	output += ", required = false";
+        	        }
+        	        
+        	        output += ")\n";
+
+        	        output += "    private " + mapJavaTypes.get(column.getBaseType()) + " _";
 
         	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output += ";\n";
@@ -248,7 +273,11 @@ public class SQLiteORM {
         	    	
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
-        	        
+        	        /*
+        	        if (tableName.equals("usuario")) {
+        	        	logger.debug("column: " + columnName + " data type: " + column.getDataType());
+        	        }
+        	        */
         	        if (!bFirst) {
         	        	bFirst = true;
         	        }
@@ -258,26 +287,28 @@ public class SQLiteORM {
 
         	        output += "\n        \"    ";
         	        
-        	        switch(column.getDataType()) {
-	    	        	case java.sql.Types.BIGINT:
-	    	        	case java.sql.Types.INTEGER:
-	    	        	case java.sql.Types.SMALLINT:
-	    	        	case java.sql.Types.TINYINT:
-	    	        	case java.sql.Types.CHAR:
-	    	        	case java.sql.Types.VARCHAR:
-	    	        	case java.sql.Types.LONGVARCHAR:
-	    	        	case java.sql.Types.DECIMAL:
-	    	        	case java.sql.Types.DOUBLE:
-	    	        	case java.sql.Types.FLOAT:
-	    	        	case java.sql.Types.BIT:
+        	        switch(column.getBaseType()) {
+	    	        	case "BIGINT":
+	    	        	case "INT":
+	    	        	case "SMALLINT":
+	    	        	case "TINYINT":
+	    	        	case "CHAR":
+	    	        	case "VARCHAR":
+	    	        	case "LONGVARCHAR":
+	    	        	case "TEXT":
+	    	        	case "DECIMAL":
+	    	        	case "DOUBLE":
+	    	        	case "FLOAT":
+	    	        	case "BIT":
 	    	        		output += tableShortAlias + "." + columnName;
 	    	        		break;
-	    	        	case java.sql.Types.DATE:
-	    	        	case java.sql.Types.TIMESTAMP:
+	    	        	case "DATE":
+	    	        	case "DATETIME":
+	    	        	case "TIMESTAMP":
 	    	        		output += "strftime(" + tableShortAlias + "." + columnName + ", '%Y-%m-%d %H:%M:%S')";
 	    	        		break;
 	    	        	default:
-	    	        		throw new Exception("Tipo no soportado: " + String.valueOf(column.getDataType()) + " columna: " + columnName);
+	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
         	        } // end switch
         	        
         	        output += " AS ";
@@ -305,8 +336,7 @@ public class SQLiteORM {
         	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
         	    	
         	        String columnName = entry.getKey();
-        	        //Column column = entry.getValue();
-        	        String memberName = toJavaFieldName(columnName);
+        	        Column column = entry.getValue();
         	        
         	        output += "        _";
         	        
@@ -314,7 +344,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output += " = null;\n";
@@ -332,8 +362,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        output +=
         	        	"    /**\n" +
         	        	"     * @return the _";
@@ -342,19 +370,19 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += columnName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output +=
         	            "\n" +
         	        	"     */\n" +
-        	        	"    public " + mapJavaTypes.get(column.getDataType()) + " get";
+        	        	"    public " + mapJavaTypes.get(column.getBaseType()) + " get";
         	        
         	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
         	        	output += "Id";
         	        }
         	        else {
-        	        	output += WordUtils.capitalize(memberName);
+        	        	output += WordUtils.capitalize(column.getMemberName());
         	        }
         	        
         	        output +=
@@ -365,7 +393,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output +=
@@ -383,8 +411,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        output +=
             	        	"    /**\n" +
             	    	        	"     * @param _";
@@ -393,7 +419,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output +=
@@ -403,7 +429,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output +=
@@ -415,17 +441,17 @@ public class SQLiteORM {
         	        	output += "Id";
         	        }
         	        else {
-        	        	output += WordUtils.capitalize(memberName);
+        	        	output += WordUtils.capitalize(column.getMemberName());
         	        }
         	        
         	        output +=
-        	            "(" + mapJavaTypes.get(column.getDataType()) + " _";
+        	            "(" + mapJavaTypes.get(column.getBaseType()) + " _";
         	        
         	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output +=
@@ -436,7 +462,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output +=
@@ -446,7 +472,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output +=
@@ -469,8 +495,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        output += 
         	        	"        ret.set"; 
         	        
@@ -478,10 +502,10 @@ public class SQLiteORM {
         	        	output += "Id";
         	        }
         	        else {
-        	        	output += WordUtils.capitalize(memberName);
+        	        	output += WordUtils.capitalize(column.getMemberName());
         	        }
         	        
-        	        output += "(p_rs.get" + mapFunctionTypes.get(column.getDataType()) + "(\"";
+        	        output += "(p_rs.get" + mapFunctionTypes.get(column.getBaseType()) + "(\"";
         	        
         	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
         	        	output += "id";
@@ -788,8 +812,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        // no se actualizan las llaves primarias
         	        if (mapPrimaryKeys.containsKey(columnName)) {
         	        	continue;
@@ -809,25 +831,27 @@ public class SQLiteORM {
         	        
         	        output += "\n            \"    ";
         	        
-        	        switch(column.getDataType()) {
-	    	        	case java.sql.Types.BIGINT:
-	    	        	case java.sql.Types.INTEGER:
-	    	        	case java.sql.Types.SMALLINT:
-	    	        	case java.sql.Types.TINYINT:
-	    	        	case java.sql.Types.DECIMAL:
-	    	        	case java.sql.Types.DOUBLE:
-	    	        	case java.sql.Types.FLOAT:
-	    	        	case java.sql.Types.BIT:
-	    	        		output += columnName + " = \" + (_" + memberName + " != null ? _" + memberName + " : \"null\")";
+        	        switch(column.getBaseType()) {
+	    	        	case "BIGINT":
+	    	        	case "INT":
+	    	        	case "SMALLINT":
+	    	        	case "TINYINT":
+	    	        	case "DECIMAL":
+	    	        	case "DOUBLE":
+	    	        	case "FLOAT":
+	    	        	case "BIT":
+	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? _" + column.getMemberName() + " : \"null\")";
 	    	        		break;
-	    	        	case java.sql.Types.CHAR:
-	    	        	case java.sql.Types.VARCHAR:
-	    	        	case java.sql.Types.LONGVARCHAR:
-	    	        	case java.sql.Types.DATE:
-	    	        	case java.sql.Types.TIMESTAMP:
-	    	        		output += columnName + " = \" + (_" + memberName + " != null ? \"'\" + _" + memberName + " + \"'\" : \"null\")";	    	        		break;
+	    	        	case "CHAR":
+	    	        	case "VARCHAR":
+	    	        	case "LONGVARCHAR":
+	    	        	case "TEXT":
+	    	        	case "DATE":
+	    	        	case "DATETIME":
+	    	        	case "TIMESTAMP":
+	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"null\")";	    	        		break;
 	    	        	default:
-	    	        		throw new Exception("Tipo no soportado: " + String.valueOf(column.getDataType()) + " columna: " + columnName);
+	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
         	        } // end switch
         	        
         	    }
@@ -904,8 +928,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        // no se insertan las llaves primarias autoincrementales
         	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement() == "YES") {
         	        	continue;
@@ -939,8 +961,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        // no se insertan las llaves primarias autoincrementales
         	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement() == "YES") {
         	        	continue;
@@ -960,22 +980,22 @@ public class SQLiteORM {
         	        
         	        output += "            \"    ";
         	        
-        	        switch(column.getDataType()) {
-	    	        	case java.sql.Types.BIGINT:
-	    	        	case java.sql.Types.INTEGER:
-	    	        	case java.sql.Types.SMALLINT:
-	    	        	case java.sql.Types.TINYINT:
-	    	        	case java.sql.Types.DECIMAL:
-	    	        	case java.sql.Types.DOUBLE:
-	    	        	case java.sql.Types.FLOAT:
-	    	        	case java.sql.Types.BIT:
+        	        switch(column.getBaseType()) {
+	    	        	case "BIGINT":
+	    	        	case "INT":
+	    	        	case "SMALLINT":
+	    	        	case "TINYINT":
+	    	        	case "DECIMAL":
+	    	        	case "DOUBLE":
+	    	        	case "FLOAT":
+	    	        	case "BIT":
 	    	        		output += "\" + (_";
 	    	        		
 	            	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += " != null ? \"'\" + _";
@@ -984,21 +1004,23 @@ public class SQLiteORM {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += " + \"'\" : \"null\")";
 	            	        
 	    	        		break;
-	    	        	case java.sql.Types.CHAR:
-	    	        	case java.sql.Types.VARCHAR:
-	    	        	case java.sql.Types.LONGVARCHAR:
-	    	        	case java.sql.Types.DATE:
-	    	        	case java.sql.Types.TIMESTAMP:
-	    	        		output += "\" + (_" + memberName + " != null ? \"'\" + _" + memberName + " + \"'\" : \"null\")";
+	    	        	case "CHAR":
+	    	        	case "VARCHAR":
+	    	        	case "LONGVARCHAR":
+	    	        	case "TEXT":
+	    	        	case "DATE":
+	    	        	case "DATETIME":
+	    	        	case "TIMESTAMP":
+	    	        		output += "\" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"null\")";
 	    	        		break;
 	    	        	default:
-	    	        		throw new Exception("Tipo no soportado: " + String.valueOf(column.getDataType()) + " columna: " + columnName);
+	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
         	        } // end switch
         	        
         	    }
@@ -1184,8 +1206,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        // no se cargan las llaves primarias
         	        if (mapPrimaryKeys.containsKey(columnName)) {
         	        	continue;
@@ -1198,7 +1218,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output += " = obj.get";
@@ -1207,7 +1227,7 @@ public class SQLiteORM {
         	        	output += "Id";
         	        }
         	        else {
-        	        	output += WordUtils.capitalize(memberName);
+        	        	output += WordUtils.capitalize(column.getMemberName());
         	        }
 
         	        output += 
@@ -1249,10 +1269,93 @@ public class SQLiteORM {
     	            "            }\n" +
     	            "        }        \n" +
     	            "        \n" +
-    	            "    }\n" +
-    	            "\n";
+    	            "    }\n";
 
     	        // fin load
+    	        
+        	    // save
+        	    
+    	        output +=
+    	        	"\n" +
+    	            "    public void save(Connection p_conn) throws SQLException {\n" +
+    	            "        \n" +
+    	            "        String str_sql = _str_sql +\n" +
+    	            "            \"    WHERE\" +\n";
+    	        
+    	        output += buildWhereSentence(mapColumns, mapPrimaryKeys, mapJavaTypes);
+    	        
+    	        output += 
+    	        	" +\n" +
+    	            "            \"    LIMIT 0, 1\";\n" +
+    	            "        \n" +
+    	            "        //System.out.println(str_sql);\n" +
+    	            "        \n" +
+    	            "        // assume that conn is an already created JDBC connection (see previous examples)\n" +
+    	            "        Statement stmt = null;\n" +
+    	            "        ResultSet rs = null;\n" +
+    	            "        Boolean exists = false;\n" +
+    	            "        \n" +
+    	            "        try {\n" +
+    	            "            stmt = p_conn.createStatement();\n" +
+    	            "            //System.out.println(\"stmt = p_conn.createStatement() ok\");\n" +
+    	            "            rs = stmt.executeQuery(str_sql);\n" +
+    	            "            //System.out.println(\"rs = stmt.executeQuery(str_sql) ok\");\n" +
+    	            "\n" +
+    	            "            // Now do something with the ResultSet ....\n" +
+    	            "\n" +
+    	            "            if (rs.next()) {\n" +
+    	            "                // registro existe\n" +
+    	            "                exists = true;\n" +
+    	            "            }\n" +
+    	            "\n" +
+    	            "            rs.close();" +
+    	            "\n" +
+    	            "            stmt.close();\n" +
+    	            "\n" +
+    	            "            if (exists) {\n" +
+    	            "            	// update\n" +
+    	            "            	update(p_conn);\n" +
+    	            "            }\n" +
+    	            "            else {\n" +
+    	            "            	// insert\n" +
+    	            "            	insert(p_conn);\n" +
+    	            "            }\n" +
+    	            "        }\n" +
+    	            "        catch (SQLException ex){\n" +
+    	            "            // handle any errors\n" +
+    	            "            System.out.println(\"SQLException: \" + ex.getMessage() + \" sentencia: \" + str_sql);\n" +
+    	            "            System.out.println(\"SQLState: \" + ex.getSQLState());\n" +
+    	            "            System.out.println(\"VendorError: \" + ex.getErrorCode());\n" +
+    	            "            \n" +
+    	            "            throw ex;\n" +
+    	            "        }\n" +
+    	            "        finally {\n" +
+    	            "            // it is a good idea to release\n" +
+    	            "            // resources in a finally{} block\n" +
+    	            "            // in reverse-order of their creation\n" +
+    	            "            // if they are no-longer needed\n" +
+    	            "            if (rs != null) {\n" +
+    	            "                try {\n" +
+    	            "                    rs.close();\n" +
+    	            "                } catch (SQLException sqlEx) { \n" +
+    	            "                    \n" +
+    	            "                } // ignore\n" +
+    	            "                rs = null;\n" +
+    	            "            }\n" +
+    	            "            if (stmt != null) {\n" +
+    	            "                try {\n" +
+    	            "                    stmt.close();\n" +
+    	            "                } catch (SQLException sqlEx) {\n" +
+    	            "                    \n" +
+    	            "                } // ignore\n" +
+    	            "                stmt = null;\n" +
+    	            "            }\n" +
+    	            "        }        \n" +
+    	            "        \n" +
+    	            "    }\n";
+
+    	        // fin save
+    	        
 
         	    // toString
         	    
@@ -1269,8 +1372,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        if (!bFirst) {
         	        	bFirst = true;
         	        }
@@ -1280,21 +1381,21 @@ public class SQLiteORM {
         	        
         	        output += "\n	           \"    _";
         	        
-        	        switch(column.getDataType()) {
-	    	        	case java.sql.Types.BIGINT:
-	    	        	case java.sql.Types.INTEGER:
-	    	        	case java.sql.Types.SMALLINT:
-	    	        	case java.sql.Types.TINYINT:
-	    	        	case java.sql.Types.DECIMAL:
-	    	        	case java.sql.Types.DOUBLE:
-	    	        	case java.sql.Types.FLOAT:
-	    	        	case java.sql.Types.BIT:
+        	        switch(column.getBaseType()) {
+	    	        	case "BIGINT":
+	    	        	case "INT":
+	    	        	case "SMALLINT":
+	    	        	case "TINYINT":
+	    	        	case "DECIMAL":
+	    	        	case "DOUBLE":
+	    	        	case "FLOAT":
+	    	        	case "BIT":
 
 	            	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += " = \" + (_";
@@ -1303,7 +1404,7 @@ public class SQLiteORM {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += " != null ? _";
@@ -1312,21 +1413,23 @@ public class SQLiteORM {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += " : \"null\")";
 	            	        
 	    	        		break;
-	    	        	case java.sql.Types.CHAR:
-	    	        	case java.sql.Types.VARCHAR:
-	    	        	case java.sql.Types.LONGVARCHAR:
-	    	        	case java.sql.Types.DATE:
-	    	        	case java.sql.Types.TIMESTAMP:
-	    	        		output += memberName + " = \" + (_" + memberName + " != null ? \"'\" + _" + memberName + " + \"'\" : \"null\")";
+	    	        	case "CHAR":
+	    	        	case "VARCHAR":
+	    	        	case "LONGVARCHAR":
+	    	        	case "TEXT":
+	    	        	case "DATE":
+	    	        	case "DATETIME":
+	    	        	case "TIMESTAMP":
+	    	        		output += column.getMemberName() + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"null\")";
 	    	        		break;
 	    	        	default:
-	    	        		throw new Exception("Tipo no soportado: " + String.valueOf(column.getDataType()) + " columna: " + columnName);
+	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
         	        } // end switch
         	        
         	    }
@@ -1354,8 +1457,6 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
         	        if (!bFirst) {
         	        	bFirst = true;
         	        }
@@ -1365,21 +1466,21 @@ public class SQLiteORM {
         	        
         	        output += "\n	           \"    \\\"_";
         	        
-        	        switch(column.getDataType()) {
-	    	        	case java.sql.Types.BIGINT:
-	    	        	case java.sql.Types.INTEGER:
-	    	        	case java.sql.Types.SMALLINT:
-	    	        	case java.sql.Types.TINYINT:
-	    	        	case java.sql.Types.DECIMAL:
-	    	        	case java.sql.Types.DOUBLE:
-	    	        	case java.sql.Types.FLOAT:
-	    	        	case java.sql.Types.BIT:
+        	        switch(column.getBaseType()) {
+	    	        	case "BIGINT":
+	    	        	case "INT":
+	    	        	case "SMALLINT":
+	    	        	case "TINYINT":
+	    	        	case "DECIMAL":
+	    	        	case "DOUBLE":
+	    	        	case "FLOAT":
+	    	        	case "BIT":
 
 	            	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += "\\\" : \" + (_";
@@ -1388,7 +1489,7 @@ public class SQLiteORM {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += " != null ? _";
@@ -1397,21 +1498,23 @@ public class SQLiteORM {
 	            	        	output += "id";
 	            	        }
 	            	        else {
-	            	        	output += memberName;
+	            	        	output += column.getMemberName();
 	            	        }
 	            	        
 	            	        output += " : \"null\")";
 	            	        
 	    	        		break;
-	    	        	case java.sql.Types.CHAR:
-	    	        	case java.sql.Types.VARCHAR:
-	    	        	case java.sql.Types.LONGVARCHAR:
-	    	        	case java.sql.Types.DATE:
-	    	        	case java.sql.Types.TIMESTAMP:
-	    	        		output += columnName + "\\\" : \" + (_" + memberName + " != null ? \"\\\"\" + _" + memberName + " + \"\\\"\" : \"null\")";	    	        		
+	    	        	case "CHAR":
+	    	        	case "VARCHAR":
+	    	        	case "LONGVARCHAR":
+	    	        	case "TEXT":
+	    	        	case "DATE":
+	    	        	case "DATETIME":
+	    	        	case "TIMESTAMP":
+	    	        		output += columnName + "\\\" : \" + (_" + column.getMemberName() + " != null ? \"\\\"\" + _" + column.getMemberName() + " + \"\\\"\" : \"null\")";	    	        		
 	    	        		break;
 	    	        	default:
-	    	        		throw new Exception("Tipo no soportado: " + String.valueOf(column.getDataType()) + " columna: " + columnName);
+	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
         	        } // end switch
         	        
         	    }
@@ -1437,15 +1540,13 @@ public class SQLiteORM {
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
-        	        String memberName = toJavaFieldName(columnName);
-        	                	        
         	        output += "\n	           \"    <";
         	        
         	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output += "\" + (_";
@@ -1454,7 +1555,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output += " != null ? \">\" + _";
@@ -1463,7 +1564,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        
         	        output += " + \"</";
@@ -1472,7 +1573,7 @@ public class SQLiteORM {
         	        	output += "id";
         	        }
         	        else {
-        	        	output += memberName;
+        	        	output += column.getMemberName();
         	        }
         	        		
         	        output += ">\" : \" xsi:nil=\\\"true\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\"/>\")" + " +";
@@ -1492,6 +1593,7 @@ public class SQLiteORM {
         	    
         	    output +=
         	    	"\n" +
+           	    	"/*\n" +
 					"    public static " + className + " fromXMLNode(Node xmlNode) {\n" +
 		            "        " + className + " ret = new " + className + "();\n\n" +
 					"        Element element = (Element) xmlNode;\n\n";
@@ -1500,9 +1602,11 @@ public class SQLiteORM {
         	    	
         	        String columnName = entry.getKey();
         	        Column column = entry.getValue();
-        	        
-        	        String memberName = toJavaFieldName(columnName);
-        	        
+        	        /*
+        	        if (tableName.equals("vehiculo")) {
+        	        	logger.debug(columnName);
+        	        }
+        	        */
         	        output += 
         	        	"        ret.set"; 
         	        
@@ -1510,16 +1614,16 @@ public class SQLiteORM {
         	        	output += "Id";
         	        }
         	        else {
-        	        	output += WordUtils.capitalize(memberName);
+        	        	output += WordUtils.capitalize(column.getMemberName());
         	        }
         	        
         	        output += "(";
         	        
-        	        if (mapFunctionTypes.get(column.getDataType()).equals("String") ) {
+        	        if (mapFunctionTypes.get(column.getBaseType()).equals("String") ) {
         	        	output += "element.getElementsByTagName(\"" + columnName + "\").item(0).getTextContent()";
         	        }
         	        else {
-        	        	output += mapJavaTypes.get(column.getDataType()) + ".decode(element.getElementsByTagName(\"" + columnName + "\").item(0).getTextContent())";
+        	        	output += mapJavaTypes.get(column.getBaseType()) + ".decode(element.getElementsByTagName(\"" + columnName + "\").item(0).getTextContent())";
         	        }
 
         	        output += 
@@ -1530,7 +1634,8 @@ public class SQLiteORM {
         	    output +=
                     "\n" +			
 		            "        return ret;\n" +
-		            "    }\n";
+		            "    }\n" +
+	                "    */\n";
 
         	           	    
         	    // fin fromXMLNode
@@ -1581,7 +1686,7 @@ public class SQLiteORM {
 	private static String buildWhereSentence(
 			Map<String, Column> p_mapColumns,
 			Map<String, PrimaryKey> p_mapPrimaryKeys,
-			Map<Integer, String> p_mapJavaTypes
+			Map<String, String> p_mapJavaTypes
 	) 
 	{
 		String res = "";
@@ -1592,8 +1697,6 @@ public class SQLiteORM {
 	        String columnName = entry.getKey();
 	        PrimaryKey pk = entry.getValue();
 	        
-	        String memberName = toJavaFieldName(columnName);
-	        
 	        if (!bFirst) {
 	        	bFirst = true;
 	        }
@@ -1601,13 +1704,13 @@ public class SQLiteORM {
 	        	res += " + \" AND\" +\n";
 	        }
 
-	        res += "            \"    " + columnName + " = \" + " + p_mapJavaTypes.get(p_mapColumns.get(columnName).getDataType()) + ".toString(this._";
+	        res += "            \"    " + columnName + " = \" + " + p_mapJavaTypes.get(p_mapColumns.get(columnName).getBaseType()) + ".toString(this._";
 	        
 	        if (p_mapPrimaryKeys.size() == 1) {
 	        	res += "id";
 	        }
 	        else {
-	        	res += memberName;;
+	        	res += Util.toJavaFieldName(columnName);
 	        }
 	        
 	        res += ")";
@@ -1634,14 +1737,6 @@ public class SQLiteORM {
 		System.out.println("Done");
 	}
 	
-	private static String toJavaFieldName(String name) { // "MY_COLUMN"
-	    String name0 = name.replace("_", " "); // to "MY COLUMN"
-	    name0 = WordUtils.capitalizeFully(name0); // to "My Column"
-	    name0 = name0.replace(" ", ""); // to "MyColumn"
-	    name0 = WordUtils.uncapitalize(name0); // to "myColumn"
-	    return name0;
-	}
-
 	private static String toJavaClassName(String name) { // "MY_TABLE"
 	    String name0 = name.replace("_", " "); // to "MY TABLE"
 	    name0 = WordUtils.capitalizeFully(name0); // to "My Table"

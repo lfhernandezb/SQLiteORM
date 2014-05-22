@@ -1,76 +1,93 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 public class Column {
-	private String _column_name;
-	private int _data_type;
-	private String _type_name;
-	private int _nullable;
-	private String _column_def;
-	private int _ordinal_position;
-	private String _is_autoincrement;
+	private String columnName;
+	private int dataType;
+	private String typeName;
+	private int nullable;
+	private String columnDef;
+	private int ordinalPosition;
+	private String isAutoincrement;
+	private String memberName;
+	private String baseType;
 	
 	// getters
 	
 	public String getColumnName() {
-		return this._column_name;
+		return this.columnName;
 	}
 	
 	public int getDataType() {
-		return this._data_type;
+		return this.dataType;
 	}
 	
 	public String getTypeName() {
-		return this._type_name;
+		return this.typeName;
 	}
 	
 	public int getNullable() {
-		return this._nullable;
+		return this.nullable;
 	}
 	
 	public String getColumnDef() {
-		return this._column_def;
+		return this.columnDef;
 	}
 	
 	public int getOrdinalPosition() {
-		return this._ordinal_position;
+		return this.ordinalPosition;
 	}
 
 	public String getIsAutoincrement() {
-		return this._is_autoincrement;
+		return this.isAutoincrement;
+	}
+
+	public String getMemberName() {
+		return memberName;
+	}
+
+	public String getBaseType() {
+		return baseType;
 	}
 
 	// setters
 	
-	public void setColumnName(String _column_name) {
-		this._column_name = _column_name;
+	public void setColumnName(String columnName) {
+		this.columnName = columnName;
 	}
 	
-	public void setDataType(int _data_type) {
-		this._data_type = _data_type;
+	public void setDataType(int dataType) {
+		this.dataType = dataType;
 	}
 	
-	public void setTypeName(String _type_name) {
-		this._type_name = _type_name;
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
 	}
 	
-	public void setNullable(int _nullable) {
-		this._nullable = _nullable;
+	public void setNullable(int nullable) {
+		this.nullable = nullable;
 	}
 	
-	public void setColumnDef(String _column_def) {
-		this._column_def = _column_def;
+	public void setColumnDef(String columnDef) {
+		this.columnDef = columnDef;
 	}
 	
-	public void setOrdinalPosition(int _ordinal_position) {
-		this._ordinal_position = _ordinal_position;
+	public void setOrdinalPosition(int ordinalPosition) {
+		this.ordinalPosition = ordinalPosition;
 	}
 
-	public void setIsAutoincrement(String _is_autoincrement) {
-		this._is_autoincrement = _is_autoincrement;
+	public void setIsAutoincrement(String isAutoincrement) {
+		this.isAutoincrement = isAutoincrement;
 	}
 	
+	public void setMemberName(String memberName) {
+		this.memberName = memberName;
+	}
+
+	public void setBaseType(String baseType) {
+		this.baseType = baseType;
+	}
+
 	public static Column fromRS(ResultSet rs) throws SQLException {
 		Column c = new Column();
 		
@@ -82,7 +99,7 @@ public class Column {
 		c.setOrdinalPosition(rs.getInt(17));
 		c.setIsAutoincrement("NO");
 		
-		// bug en SQLDroid
+		// bug en driver
 		if (c.getTypeName().equals("BIT(1)")) {
 			c.setDataType(java.sql.Types.BIT);
 		}
@@ -90,16 +107,20 @@ public class Column {
 			c.setDataType(java.sql.Types.BIGINT);
 		}
 		
+		c.setMemberName(Util.toJavaFieldName(c.getColumnName()));
+		
+		c.setBaseType(c.getTypeName().split("\\(")[0]);
+		
 		return c;
 	}
 
 	@Override
 	public String toString() {
-		return "Column [_column_name=" + _column_name + ", _data_type="
-				+ _data_type + ", _type_name=" + _type_name + ", _nullable="
-				+ _nullable + ", _column_def=" + _column_def
-				+ ", _ordinal_position=" + _ordinal_position
-				+ ", _is_autoincrement=" + _is_autoincrement + "]";
+		return "Column [_column_name=" + columnName + ", _data_type="
+				+ dataType + ", _type_name=" + typeName + ", _nullable="
+				+ nullable + ", _column_def=" + columnDef
+				+ ", _ordinal_position=" + ordinalPosition
+				+ ", _is_autoincrement=" + isAutoincrement + "]";
 	}
 	
 }
