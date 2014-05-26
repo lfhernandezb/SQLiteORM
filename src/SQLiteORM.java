@@ -203,7 +203,7 @@ public class SQLiteORM {
 	        	    "/**\n" +
 	           	    " * \n" +
 	                " */\n" +
-	           	    "package cl.dsoft.sqlite.db;\n" +
+	           	    "package " + System.getProperty("package_name") + ";\n" +
 	           	    "\n" +
 					"import java.sql.Connection;\n" +
 					"import java.sql.ResultSet;\n" +
@@ -305,7 +305,7 @@ public class SQLiteORM {
 	    	        	case "DATE":
 	    	        	case "DATETIME":
 	    	        	case "TIMESTAMP":
-	    	        		output += "strftime(" + tableShortAlias + "." + columnName + ", '%Y-%m-%d %H:%M:%S')";
+	    	        		output += "strftime('%Y-%m-%d %H:%M:%S', " + tableShortAlias + "." + columnName + ")";
 	    	        		break;
 	    	        	default:
 	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
@@ -605,6 +605,8 @@ public class SQLiteORM {
     	        }
 
     	        // fin getById
+    	        
+    	        // seek
         	    
     	        output +=
         	        	"    \n" +
@@ -682,7 +684,7 @@ public class SQLiteORM {
         	        
         	        output += 
             	        	"if (p.getKey().equals(\"mas reciente\")) {\n" +
-                    	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > '\" + p.getValue() + \"'\");\n" +
+                    	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > \" + p.getValue());\n" +
                     	    "                }\n";
 
         	    }
@@ -793,7 +795,9 @@ public class SQLiteORM {
     	        	"    }\n" +
     	        	"\n";
         	    
+        	    // fin seek
         	    
+        	    // update
         	        
         	    output +=
     	        	"    public int update(Connection p_conn) throws SQLException {\n" +
@@ -821,7 +825,7 @@ public class SQLiteORM {
         	        if (mapForeignKeys.containsKey(columnName)) {
         	        	continue;
         	        }
-
+        	        
         	        if (!bFirst) {
         	        	bFirst = true;
         	        }
@@ -909,6 +913,9 @@ public class SQLiteORM {
     	        	"    }\n" +
     	        	"    \n";
     	        	
+        	    // fin update
+        	    
+        	    // insert
     	        	
         	    output +=
     	        	"    public int insert(Connection p_conn) throws SQLException {\n" +
@@ -932,12 +939,12 @@ public class SQLiteORM {
         	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement() == "YES") {
         	        	continue;
         	        }
-        	        
+        	        /*
         	        // no se insertan columnas con valor por defecto
         	        if (column.getColumnDef() != null) {
         	        	continue;
         	        }
-
+                    */
         	        if (!bFirst) {
         	        	bFirst = true;
         	        }
@@ -965,12 +972,12 @@ public class SQLiteORM {
         	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement() == "YES") {
         	        	continue;
         	        }
-        	        
+        	        /*
         	        // no se insertan columnas con valor por defecto
         	        if (column.getColumnDef() != null) {
         	        	continue;
         	        }
-
+                    */
         	        if (!bFirst) {
         	        	bFirst = true;
         	        }
