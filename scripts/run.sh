@@ -21,8 +21,8 @@ $PROGRAM_PATH/../bin/SQLiteORM.jar
 $JAVA_HOME/bin/java \
 -Djava.io.tmpdir=$TMP_DIR \
 -Dlog4j.debug=true \
--Dpackage_name=cl.dsoft.mobile.db \
 -Dlog4j.configuration=file:$PROGRAM_PATH/../etc/log4j.xml \
+-Dpackage_name=cl.dsoft.mobile.db \
 -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger \
 -Dconfig_file=$PROGRAM_PATH/../etc/config.ini \
 -Ddata_file=$PROGRAM_PATH/../data/car.db3 \

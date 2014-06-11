@@ -118,6 +118,7 @@ public class SQLiteORM {
     		mapJavaTypes.put("DATETIME", "String");
     		mapJavaTypes.put("TIMESTAMP", "String");
     		mapJavaTypes.put("BIT", "Boolean");
+    		mapJavaTypes.put("BOOLEAN", "Boolean");
     		mapJavaTypes.put("DECIMAL", "Decimal");
     		mapJavaTypes.put("DOUBLE", "Double");
     		mapJavaTypes.put("FLOAT", "Float");
@@ -135,6 +136,7 @@ public class SQLiteORM {
     		mapFunctionTypes.put("DATETIME", "String");
     		mapFunctionTypes.put("TIMESTAMP", "String");
     		mapFunctionTypes.put("BIT", "Boolean");
+    		mapFunctionTypes.put("BOOLEAN", "Boolean");
     		mapFunctionTypes.put("DECIMAL", "Decimal");
     		mapFunctionTypes.put("DOUBLE", "Double");
     		mapFunctionTypes.put("FLOAT", "Float");
@@ -300,6 +302,7 @@ public class SQLiteORM {
 	    	        	case "DOUBLE":
 	    	        	case "FLOAT":
 	    	        	case "BIT":
+	    	        	case "BOOLEAN":
 	    	        		output += tableShortAlias + "." + columnName;
 	    	        		break;
 	    	        	case "DATE":
@@ -844,6 +847,7 @@ public class SQLiteORM {
 	    	        	case "DOUBLE":
 	    	        	case "FLOAT":
 	    	        	case "BIT":
+	    	        	case "BOOLEAN":
 	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? _" + column.getMemberName() + " : \"null\")";
 	    	        		break;
 	    	        	case "CHAR":
@@ -996,6 +1000,7 @@ public class SQLiteORM {
 	    	        	case "DOUBLE":
 	    	        	case "FLOAT":
 	    	        	case "BIT":
+	    	        	case "BOOLEAN":
 	    	        		output += "\" + (_";
 	    	        		
 	            	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
@@ -1397,6 +1402,7 @@ public class SQLiteORM {
 	    	        	case "DOUBLE":
 	    	        	case "FLOAT":
 	    	        	case "BIT":
+	    	        	case "BOOLEAN":
 
 	            	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
 	            	        	output += "id";
@@ -1482,6 +1488,7 @@ public class SQLiteORM {
 	    	        	case "DOUBLE":
 	    	        	case "FLOAT":
 	    	        	case "BIT":
+	    	        	case "BOOLEAN":
 
 	            	        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
 	            	        	output += "id";
