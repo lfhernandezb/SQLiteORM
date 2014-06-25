@@ -5,7 +5,7 @@ public class Column {
 	private String columnName;
 	private int dataType;
 	private String typeName;
-	private int nullable;
+	private String isNullable;
 	private String columnDef;
 	private int ordinalPosition;
 	private String isAutoincrement;
@@ -26,8 +26,8 @@ public class Column {
 		return this.typeName;
 	}
 	
-	public int getNullable() {
-		return this.nullable;
+	public String getIsNullable() {
+		return this.isNullable;
 	}
 	
 	public String getColumnDef() {
@@ -64,8 +64,8 @@ public class Column {
 		this.typeName = typeName;
 	}
 	
-	public void setNullable(int nullable) {
-		this.nullable = nullable;
+	public void setIsNullable(String isNullable) {
+		this.isNullable = isNullable;
 	}
 	
 	public void setColumnDef(String columnDef) {
@@ -94,7 +94,7 @@ public class Column {
 		c.setColumnName(rs.getString(4));
 		c.setDataType(rs.getInt(5));
 		c.setTypeName(rs.getString(6));
-		c.setNullable(rs.getInt(11));
+		c.setIsNullable(rs.getString(18));
 		c.setColumnDef(rs.getString(13));
 		c.setOrdinalPosition(rs.getInt(17));
 		c.setIsAutoincrement("NO");
@@ -118,7 +118,7 @@ public class Column {
 	public String toString() {
 		return "Column [_column_name=" + columnName + ", _data_type="
 				+ dataType + ", _type_name=" + typeName + ", _nullable="
-				+ nullable + ", _column_def=" + columnDef
+				+ isNullable + ", _column_def=" + columnDef
 				+ ", _ordinal_position=" + ordinalPosition
 				+ ", _is_autoincrement=" + isAutoincrement + "]";
 	}

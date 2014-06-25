@@ -244,7 +244,7 @@ public class SQLiteORM {
         	        
         	        output += "\"";
         	        
-        	        if (column.getNullable() == 1) {
+        	        if (column.getIsNullable().equals("YES")) {
         	        	output += ", required = false";
         	        }
         	        
@@ -816,7 +816,8 @@ public class SQLiteORM {
         	        
         	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
         	    	
-        	        String columnName = entry.getKey();
+        	        String value = "null";
+        	    	String columnName = entry.getKey();
         	        Column column = entry.getValue();
         	        
         	        // no se actualizan las llaves primarias
@@ -838,6 +839,10 @@ public class SQLiteORM {
         	        
         	        output += "\n            \"    ";
         	        
+        	        if (column.getColumnDef() != null && column.getIsNullable().equals("NO")) {
+        	        	value = column.getColumnDef();
+        	        }
+        	        
         	        switch(column.getBaseType()) {
 	    	        	case "BIGINT":
 	    	        	case "INT":
@@ -848,7 +853,7 @@ public class SQLiteORM {
 	    	        	case "FLOAT":
 	    	        	case "BIT":
 	    	        	case "BOOLEAN":
-	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? _" + column.getMemberName() + " : \"null\")";
+	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? _" + column.getMemberName() + " : \"" + value + "\")";
 	    	        		break;
 	    	        	case "CHAR":
 	    	        	case "VARCHAR":
@@ -857,7 +862,7 @@ public class SQLiteORM {
 	    	        	case "DATE":
 	    	        	case "DATETIME":
 	    	        	case "TIMESTAMP":
-	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"null\")";	    	        		break;
+	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";	    	        		break;
 	    	        	default:
 	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
         	        } // end switch
@@ -969,8 +974,9 @@ public class SQLiteORM {
     	        
         	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
         	    	
-        	        String columnName = entry.getKey();
-        	        Column column = entry.getValue();
+        	        String value = "null";
+        	    	String columnName = entry.getKey();
+        	        Column column = entry.getValue();        	        
         	        
         	        // no se insertan las llaves primarias autoincrementales
         	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement() == "YES") {
@@ -982,6 +988,11 @@ public class SQLiteORM {
         	        	continue;
         	        }
                     */
+        	        
+        	        if (column.getColumnDef() != null && column.getIsNullable().equals("NO")) {
+        	        	value = column.getColumnDef();
+        	        }
+        	        
         	        if (!bFirst) {
         	        	bFirst = true;
         	        }
@@ -1019,7 +1030,7 @@ public class SQLiteORM {
 	            	        	output += column.getMemberName();
 	            	        }
 	            	        
-	            	        output += " + \"'\" : \"null\")";
+	            	        output += " + \"'\" : \"" + value + "\")";
 	            	        
 	    	        		break;
 	    	        	case "CHAR":
@@ -1029,7 +1040,7 @@ public class SQLiteORM {
 	    	        	case "DATE":
 	    	        	case "DATETIME":
 	    	        	case "TIMESTAMP":
-	    	        		output += "\" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"null\")";
+	    	        		output += "\" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
 	    	        		break;
 	    	        	default:
 	    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
