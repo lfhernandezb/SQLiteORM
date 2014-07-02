@@ -705,7 +705,7 @@ public class SQLiteORM {
         	        
         	        output += 
             	        	"if (p.getKey().equals(\"no borrado\")) {\n" +
-                    	    "                    array_clauses.add(\"" + tableShortAlias + ".borrado = 0\");\n" +
+                    	    "                    array_clauses.add(\"" + tableShortAlias + ".borrado = 'false'\");\n" +
                     	    "                }\n";
 
         	        output += "                ";
@@ -714,7 +714,7 @@ public class SQLiteORM {
         	        
         	        output += 
             	        	"if (p.getKey().equals(\"borrado\")) {\n" +
-                    	    "                    array_clauses.add(\"" + tableShortAlias + ".borrado = 1\");\n" +
+                    	    "                    array_clauses.add(\"" + tableShortAlias + ".borrado = 'true'\");\n" +
                     	    "                }\n";
         	    }
 
@@ -853,7 +853,7 @@ public class SQLiteORM {
 	    	        	case "FLOAT":
 	    	        	case "BIT":
 	    	        	case "BOOLEAN":
-	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? _" + column.getMemberName() + " : \"" + value + "\")";
+	    	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"'" + value + "'\")";
 	    	        		break;
 	    	        	case "CHAR":
 	    	        	case "VARCHAR":
@@ -1030,7 +1030,7 @@ public class SQLiteORM {
 	            	        	output += column.getMemberName();
 	            	        }
 	            	        
-	            	        output += " + \"'\" : \"" + value + "\")";
+	            	        output += " + \"'\" : \"'" + value + "'\")";
 	            	        
 	    	        		break;
 	    	        	case "CHAR":
