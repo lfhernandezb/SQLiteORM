@@ -9,7 +9,7 @@ TMP_DIR=/var/tmp
 CLASSPATH=\
 $JAVA_HOME/lib/tools.jar:
 CLASSPATH=\
-$PROGRAM_PATH/../dist/SQLiteORM.jar
+$PROGRAM_PATH/../dist/TestSQLiteORM.jar
 
 # seteando el classpath
 . $PROGRAM_PATH/env.sh
@@ -28,6 +28,6 @@ $JAVA_HOME/bin/java \
 -Ddata_file=$PROGRAM_PATH/../data/car.db3 \
 -Doutput_dir=$PROGRAM_PATH/../output \
 -cp $CLASSPATH \
-SQLiteORM
+TestSQLiteORM
 
 #$JAVACMD LoadCaf $@
