@@ -936,7 +936,13 @@ public class GenericORM {
         		}
         		else if (!mapForeignKeys.containsKey(entry.getKey())) {
         			bFlag = false;
-        			columnId = mapColumns.get(entry.getKey()).getMemberName();
+        			
+        			if (mapPrimaryKeys.size() == 1) {
+        				columnId = "id";
+        	        }
+        	        else {
+        	        	columnId = mapColumns.get(entry.getKey()).getMemberName();
+        	        }
         		}
         	}
 	        
@@ -1047,7 +1053,7 @@ public class GenericORM {
 	    	        	output += column.getMemberName();
 	    	        }
 	    	        
-	    	        output += " + \"'\" : \"'" + value + "'\")";
+	    	        output += " + \"'\" : \"" + value + "\")";
 	    	        
 	        		break;
 	        	case "CHAR":
@@ -1209,7 +1215,7 @@ public class GenericORM {
 	        	case "FLOAT":
 	        	case "BIT":
 	        	case "BOOLEAN":
-	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"'" + value + "'\")";
+	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
 	        		break;
 	        	case "CHAR":
 	        	case "VARCHAR":

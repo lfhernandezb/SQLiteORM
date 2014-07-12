@@ -26,7 +26,7 @@ $JAVA_HOME/bin/java \
 -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger \
 -Dconfig_file=$PROGRAM_PATH/../etc/config.ini \
 -Ddata_file=$PROGRAM_PATH/../data/car.db3 \
--Doutput_dir=$PROGRAM_PATH/../output \
+-Doutput_dir=$PROGRAM_PATH/../output/files \
 -cp $CLASSPATH \
 TestSQLiteORM
 
