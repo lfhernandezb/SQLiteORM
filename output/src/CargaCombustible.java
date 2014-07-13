@@ -485,9 +485,9 @@ public class CargaCombustible {
         String str_sql =
             "    UPDATE carga_combustible" +
             "    SET" +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    estanque_lleno = " + (_estanqueLleno != null ? "'" + _estanqueLleno + "'" : "null") + "," +
-            "    fecha = " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    fecha = " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    borrado = " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +
             "    latitud = " + (_latitud != null ? "'" + _latitud + "'" : "null") + "," +
             "    costo = " + (_costo != null ? "'" + _costo + "'" : "null") + "," +
@@ -565,9 +565,9 @@ public class CargaCombustible {
             "    litros)" +
             "    VALUES" +
             "    (" +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_estanqueLleno != null ? "'" + _estanqueLleno + "'" : "null") + "," +
-            "    " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    " + (_idUsuario != null ? "'" + _idUsuario + "'" : "null") + "," +
             "    " + (_idVehiculo != null ? "'" + _idVehiculo + "'" : "null") + "," +
             "    " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +

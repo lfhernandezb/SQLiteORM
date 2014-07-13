@@ -483,7 +483,7 @@ public class MantencionBase {
             "    dias_entre_mantenciones = " + (_diasEntreMantenciones != null ? "'" + _diasEntreMantenciones + "'" : "null") + "," +
             "    descripcion_item = " + (_descripcionItem != null ? "'" + _descripcionItem + "'" : "null") + "," +
             "    traccion = " + (_traccion != null ? "'" + _traccion + "'" : "null") + "," +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    combustible = " + (_combustible != null ? "'" + _combustible + "'" : "null") + "," +
             "    km_entre_mantenciones = " + (_kmEntreMantenciones != null ? "'" + _kmEntreMantenciones + "'" : "null") + "," +
             "    depende_km = " + (_dependeKm != null ? "'" + _dependeKm + "'" : "null") + "," +
@@ -564,7 +564,7 @@ public class MantencionBase {
             "    " + (_diasEntreMantenciones != null ? "'" + _diasEntreMantenciones + "'" : "null") + "," +
             "    " + (_descripcionItem != null ? "'" + _descripcionItem + "'" : "null") + "," +
             "    " + (_traccion != null ? "'" + _traccion + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_combustible != null ? "'" + _combustible + "'" : "null") + "," +
             "    " + (_id != null ? "'" + _id + "'" : "null") + "," +
             "    " + (_kmEntreMantenciones != null ? "'" + _kmEntreMantenciones + "'" : "null") + "," +

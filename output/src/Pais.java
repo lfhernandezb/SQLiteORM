@@ -320,7 +320,7 @@ public class Pais {
         String str_sql =
             "    UPDATE pais" +
             "    SET" +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    pais = " + (_pais != null ? "'" + _pais + "'" : "null") +
             "    WHERE" +
             "    id_pais = " + Long.toString(this._id);
@@ -384,7 +384,7 @@ public class Pais {
             "    VALUES" +
             "    (" +
             "    " + (_id != null ? "'" + _id + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_pais != null ? "'" + _pais + "'" : "null") +
             "    )";
         

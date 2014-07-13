@@ -532,7 +532,7 @@ public class Vehiculo {
             "    UPDATE vehiculo" +
             "    SET" +
             "    anio = " + (_anio != null ? "'" + _anio + "'" : "null") + "," +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    aire_acondicionado = " + (_aireAcondicionado != null ? "'" + _aireAcondicionado + "'" : "null") + "," +
             "    alias = " + (_alias != null ? "'" + _alias + "'" : "null") + "," +
             "    borrado = " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +
@@ -613,7 +613,7 @@ public class Vehiculo {
             "    VALUES" +
             "    (" +
             "    " + (_anio != null ? "'" + _anio + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_aireAcondicionado != null ? "'" + _aireAcondicionado + "'" : "null") + "," +
             "    " + (_alias != null ? "'" + _alias + "'" : "null") + "," +
             "    " + (_idUsuario != null ? "'" + _idUsuario + "'" : "null") + "," +

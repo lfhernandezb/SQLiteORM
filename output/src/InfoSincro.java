@@ -337,7 +337,7 @@ public class InfoSincro {
         String str_sql =
             "    UPDATE info_sincro" +
             "    SET" +
-            "    fecha = " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    fecha = " + (_fecha != null ? "datetime('" + _fecha + "', 'localtime')" : "null") + "," +
             "    sentido = " + (_sentido != null ? "'" + _sentido + "'" : "null") +
             "    WHERE" +
             "    id_info_sincro = " + Integer.toString(this._id);
@@ -402,7 +402,7 @@ public class InfoSincro {
             "    VALUES" +
             "    (" +
             "    " + (_id != null ? "'" + _id + "'" : "null") + "," +
-            "    " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    " + (_fecha != null ? "datetime('" + _fecha + "', 'localtime')" : "null") + "," +
             "    " + (_sentido != null ? "'" + _sentido + "'" : "null") + "," +
             "    " + (_usuarioIdUsuario != null ? "'" + _usuarioIdUsuario + "'" : "null") +
             "    )";

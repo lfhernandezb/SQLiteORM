@@ -477,7 +477,7 @@ public class Log {
             "    UPDATE log" +
             "    SET" +
             "    id_tipo_vehiculo = " + (_idTipoVehiculo != null ? "'" + _idTipoVehiculo + "'" : "null") + "," +
-            "    fecha = " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    fecha = " + (_fecha != null ? "datetime('" + _fecha + "', 'localtime')" : "null") + "," +
             "    id_vehiculo = " + (_idVehiculo != null ? "'" + _idVehiculo + "'" : "null") + "," +
             "    latitud = " + (_latitud != null ? "'" + _latitud + "'" : "null") + "," +
             "    id_modelo = " + (_idModelo != null ? "'" + _idModelo + "'" : "null") + "," +
@@ -557,7 +557,7 @@ public class Log {
             "    VALUES" +
             "    (" +
             "    " + (_idTipoVehiculo != null ? "'" + _idTipoVehiculo + "'" : "null") + "," +
-            "    " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    " + (_fecha != null ? "datetime('" + _fecha + "', 'localtime')" : "null") + "," +
             "    " + (_vehiculoIdUsuario != null ? "'" + _vehiculoIdUsuario + "'" : "null") + "," +
             "    " + (_idVehiculo != null ? "'" + _idVehiculo + "'" : "null") + "," +
             "    " + (_latitud != null ? "'" + _latitud + "'" : "null") + "," +

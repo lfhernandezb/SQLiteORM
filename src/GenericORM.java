@@ -1060,10 +1060,14 @@ public class GenericORM {
 	        	case "VARCHAR":
 	        	case "LONGVARCHAR":
 	        	case "TEXT":
+	        		output += "\" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
+	        		break;
 	        	case "DATE":
+	        		output += "\" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
+	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
-	        		output += "\" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
+	        		output += "\" + (_" + column.getMemberName() + " != null ? \"datetime('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
 	        		break;
 	        	default:
 	        		throw new UnsupportedDataTypeException("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
@@ -1221,10 +1225,15 @@ public class GenericORM {
 	        	case "VARCHAR":
 	        	case "LONGVARCHAR":
 	        	case "TEXT":
+	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
+	        		break;
 	        	case "DATE":
+	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
+	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
-	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";	    	        		break;
+	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"datetime('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
+	        		break;
 	        	default:
 	        		throw new UnsupportedDataTypeException("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
 	        } // end switch

@@ -437,8 +437,8 @@ public class MantencionBaseHecha {
         String str_sql =
             "    UPDATE mantencion_base_hecha" +
             "    SET" +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    fecha = " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    fecha = " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    borrado = " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +
             "    costo = " + (_costo != null ? "'" + _costo + "'" : "null") + "," +
             "    km = " + (_km != null ? "'" + _km + "'" : "null") +
@@ -509,8 +509,8 @@ public class MantencionBaseHecha {
             "    id_mantencion_base_hecha)" +
             "    VALUES" +
             "    (" +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    " + (_vehiculoIdUsuario != null ? "'" + _vehiculoIdUsuario + "'" : "null") + "," +
             "    " + (_idMantencionBase != null ? "'" + _idMantencionBase + "'" : "null") + "," +
             "    " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +

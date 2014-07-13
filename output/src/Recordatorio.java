@@ -469,8 +469,8 @@ public class Recordatorio {
             "    UPDATE recordatorio" +
             "    SET" +
             "    titulo = " + (_titulo != null ? "'" + _titulo + "'" : "null") + "," +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    fecha = " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    fecha = " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    borrado = " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +
             "    descripcion = " + (_descripcion != null ? "'" + _descripcion + "'" : "null") + "," +
             "    recordar_km = " + (_recordarKm != null ? "'" + _recordarKm + "'" : "null") + "," +
@@ -548,8 +548,8 @@ public class Recordatorio {
             "    (" +
             "    " + (_idRecordatorio != null ? "'" + _idRecordatorio + "'" : "null") + "," +
             "    " + (_titulo != null ? "'" + _titulo + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    " + (_idUsuario != null ? "'" + _idUsuario + "'" : "null") + "," +
             "    " + (_idVehiculo != null ? "'" + _idVehiculo + "'" : "null") + "," +
             "    " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +

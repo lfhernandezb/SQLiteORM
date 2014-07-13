@@ -320,7 +320,7 @@ public class Combustible {
         String str_sql =
             "    UPDATE combustible" +
             "    SET" +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    descripcion = " + (_descripcion != null ? "'" + _descripcion + "'" : "null") +
             "    WHERE" +
             "    id_combustible = " + Byte.toString(this._id);
@@ -383,7 +383,7 @@ public class Combustible {
             "    id_combustible)" +
             "    VALUES" +
             "    (" +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_descripcion != null ? "'" + _descripcion + "'" : "null") + "," +
             "    " + (_id != null ? "'" + _id + "'" : "null") +
             "    )";

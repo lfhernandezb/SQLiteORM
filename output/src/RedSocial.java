@@ -320,7 +320,7 @@ public class RedSocial {
         String str_sql =
             "    UPDATE red_social" +
             "    SET" +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    red_social = " + (_redSocial != null ? "'" + _redSocial + "'" : "null") +
             "    WHERE" +
             "    id_red_social = " + Long.toString(this._id);
@@ -383,7 +383,7 @@ public class RedSocial {
             "    red_social)" +
             "    VALUES" +
             "    (" +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_id != null ? "'" + _id + "'" : "null") + "," +
             "    " + (_redSocial != null ? "'" + _redSocial + "'" : "null") +
             "    )";

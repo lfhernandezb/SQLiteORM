@@ -341,7 +341,7 @@ public class Comuna {
             "    UPDATE comuna" +
             "    SET" +
             "    comuna = " + (_comuna != null ? "'" + _comuna + "'" : "null") + "," +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") +
             "    WHERE" +
             "    id_comuna = " + Long.toString(this._id);
 
@@ -406,7 +406,7 @@ public class Comuna {
             "    (" +
             "    " + (_idRegion != null ? "'" + _idRegion + "'" : "null") + "," +
             "    " + (_comuna != null ? "'" + _comuna + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_id != null ? "'" + _id + "'" : "null") +
             "    )";
         

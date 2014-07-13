@@ -486,7 +486,7 @@ public class MantencionUsuario {
             "    UPDATE mantencion_usuario" +
             "    SET" +
             "    nombre = " + (_nombre != null ? "'" + _nombre + "'" : "null") + "," +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    borrado = " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +
             "    KmEntreMantenciones = " + (_kmentremantenciones != null ? "'" + _kmentremantenciones + "'" : "null") + "," +
             "    descripcion = " + (_descripcion != null ? "'" + _descripcion + "'" : "null") + "," +
@@ -566,7 +566,7 @@ public class MantencionUsuario {
             "    VALUES" +
             "    (" +
             "    " + (_nombre != null ? "'" + _nombre + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
             "    " + (_idUsuario != null ? "'" + _idUsuario + "'" : "null") + "," +
             "    " + (_idVehiculo != null ? "'" + _idVehiculo + "'" : "null") + "," +
             "    " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +

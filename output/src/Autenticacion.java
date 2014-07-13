@@ -377,8 +377,8 @@ public class Autenticacion {
         String str_sql =
             "    UPDATE autenticacion" +
             "    SET" +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    fecha = " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    fecha = " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    token = " + (_token != null ? "'" + _token + "'" : "null") +
             "    WHERE" +
             "    id_autenticacion = " + Long.toString(this._id);
@@ -444,8 +444,8 @@ public class Autenticacion {
             "    id_autenticacion)" +
             "    VALUES" +
             "    (" +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    " + (_fecha != null ? "'" + _fecha + "'" : "null") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fecha != null ? "date('" + _fecha + "', 'localtime')" : "null") + "," +
             "    " + (_idRedSocial != null ? "'" + _idRedSocial + "'" : "null") + "," +
             "    " + (_token != null ? "'" + _token + "'" : "null") + "," +
             "    " + (_idUsuario != null ? "'" + _idUsuario + "'" : "null") + "," +

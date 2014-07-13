@@ -449,13 +449,13 @@ public class Usuario {
             "    UPDATE usuario" +
             "    SET" +
             "    nombre = " + (_nombre != null ? "'" + _nombre + "'" : "null") + "," +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    fecha_vencimiento_licencia = " + (_fechaVencimientoLicencia != null ? "'" + _fechaVencimientoLicencia + "'" : "null") + "," +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    fecha_vencimiento_licencia = " + (_fechaVencimientoLicencia != null ? "date('" + _fechaVencimientoLicencia + "', 'localtime')" : "null") + "," +
             "    hombre = " + (_hombre != null ? "'" + _hombre + "'" : "null") + "," +
             "    borrado = " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +
             "    telefono = " + (_telefono != null ? "'" + _telefono + "'" : "null") + "," +
             "    correo = " + (_correo != null ? "'" + _correo + "'" : "null") + "," +
-            "    fecha_nacimiento = " + (_fechaNacimiento != null ? "'" + _fechaNacimiento + "'" : "null") +
+            "    fecha_nacimiento = " + (_fechaNacimiento != null ? "date('" + _fechaNacimiento + "', 'localtime')" : "null") +
             "    WHERE" +
             "    id_usuario = " + Long.toString(this._id);
 
@@ -525,15 +525,15 @@ public class Usuario {
             "    VALUES" +
             "    (" +
             "    " + (_nombre != null ? "'" + _nombre + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") + "," +
-            "    " + (_fechaVencimientoLicencia != null ? "'" + _fechaVencimientoLicencia + "'" : "null") + "," +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") + "," +
+            "    " + (_fechaVencimientoLicencia != null ? "date('" + _fechaVencimientoLicencia + "', 'localtime')" : "null") + "," +
             "    " + (_id != null ? "'" + _id + "'" : "null") + "," +
             "    " + (_hombre != null ? "'" + _hombre + "'" : "null") + "," +
             "    " + (_idComuna != null ? "'" + _idComuna + "'" : "null") + "," +
             "    " + (_borrado != null ? "'" + _borrado + "'" : "'false'") + "," +
             "    " + (_telefono != null ? "'" + _telefono + "'" : "null") + "," +
             "    " + (_correo != null ? "'" + _correo + "'" : "null") + "," +
-            "    " + (_fechaNacimiento != null ? "'" + _fechaNacimiento + "'" : "null") +
+            "    " + (_fechaNacimiento != null ? "date('" + _fechaNacimiento + "', 'localtime')" : "null") +
             "    )";
         
         try {

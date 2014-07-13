@@ -341,7 +341,7 @@ public class Region {
             "    UPDATE region" +
             "    SET" +
             "    region = " + (_region != null ? "'" + _region + "'" : "null") + "," +
-            "    fecha_modificacion = " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") +
+            "    fecha_modificacion = " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") +
             "    WHERE" +
             "    id_region = " + Long.toString(this._id);
 
@@ -407,7 +407,7 @@ public class Region {
             "    " + (_region != null ? "'" + _region + "'" : "null") + "," +
             "    " + (_id != null ? "'" + _id + "'" : "null") + "," +
             "    " + (_idPais != null ? "'" + _idPais + "'" : "null") + "," +
-            "    " + (_fechaModificacion != null ? "'" + _fechaModificacion + "'" : "datetime('now', 'localtime')") +
+            "    " + (_fechaModificacion != null ? "datetime('" + _fechaModificacion + "', 'localtime')" : "datetime('now', 'localtime')") +
             "    )";
         
         try {
