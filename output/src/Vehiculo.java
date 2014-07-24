@@ -911,7 +911,7 @@ public class Vehiculo {
     	ArrayList<MantencionBaseHecha> ret;
     	ArrayList<MantencionBase> list_mb;
     	ArrayList<AbstractMap.SimpleEntry<String, String>> parametros;
-    	Integer kmInicial = 0;
+    	Integer kmInicial;
     	String traccion, combustible;
     	
     	traccion = Traccion.getById(p_conn, this.getIdTraccion().toString()).getDescripcion();
@@ -932,6 +932,7 @@ public class Vehiculo {
     		MantencionBaseHecha mbh; // = new MantencionBaseHecha();
     		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     		Integer n;
+    		kmInicial = 0;
     		
     		if (mb.getDependeKm() && mb.getDiasEntreMantenciones() != null) {
     		
