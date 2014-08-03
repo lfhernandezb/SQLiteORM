@@ -108,58 +108,112 @@ MantencionBase
 
 MantencionBaseHecha
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
     /**
-     * @return the _fecha
+     * @return the _fecha as seconds from January 1, 1970, 00:00:00 GMT
      */
-    public String getFecha() {
-        return _fecha;
+    public long getFechaAsLong() throws ParseException {
+        Date d;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        d = formatter.parse(_fecha);
+
+        return (long)d.getTime() / 1000L;
     }
 
     /**
-     * @param _fecha the _fecha to set
+     * @param _fecha the _fecha to set as seconds from January 1, 1970, 00:00:00 GMT
      */
-    public void setFecha(String _fecha) {
-        this._fecha = _fecha;
+    public void setFecha(long _timeStamp) {
+        Date d;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        d = new Date((long)_timeStamp*1000);
+
+        this._fecha = formatter.format(d);
     }
 
 Usuario
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
     /**
-     * @return the _fechaVencimientoLicencia
+     * @return the _fechaVencimientoLicencia as seconds from January 1, 1970, 00:00:00 GMT
      */
-    public String getFechaVencimientoLicencia() {
-        return _fechaVencimientoLicencia;
+    public long getFechaVencimientoLicenciaAsLong() throws ParseException {
+        Date d;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        d = formatter.parse(_fechaVencimientoLicencia);
+
+        return (long)d.getTime() / 1000L;
     }
 
     /**
-     * @return the _fechaNacimiento
+     * @return the _fechaNacimiento as seconds from January 1, 1970, 00:00:00 GMT
      */
-    public String getFechaNacimiento() {
-        return _fechaNacimiento;
+    public long getFechaNacimientoAsLong() throws ParseException {
+        Date d;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        d = formatter.parse(_fechaNacimiento);
+
+        return (long)d.getTime() / 1000L;
     }
 
     /**
-     * @param _fechaVencimientoLicencia the _fechaVencimientoLicencia to set
+     * @param _fechaVencimientoLicencia the _fechaVencimientoLicencia to set as seconds from January 1, 1970, 00:00:00 GMT
      */
-    public void setFechaVencimientoLicencia(String _fechaVencimientoLicencia) {
-        this._fechaVencimientoLicencia = _fechaVencimientoLicencia;
+    public void setFechaVencimientoLicencia(long _timeStamp) {
+        Date d;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        d = new Date((long)_timeStamp*1000);
+
+        this._fechaVencimientoLicencia = formatter.format(d);
     }
 
     /**
-     * @param _fechaNacimiento the _fechaNacimiento to set
+     * @param _fechaNacimiento the _fechaNacimiento to set as seconds from January 1, 1970, 00:00:00 GMT
      */
-    public void setFechaNacimiento(String _fechaNacimiento) {
-        this._fechaNacimiento = _fechaNacimiento;
+    public void setFechaNacimiento(long _timeStamp) {
+        Date d;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        d = new Date((long)_timeStamp*1000);
+
+        this._fechaNacimiento = formatter.format(d);
     }
 
 Vehiculo
 
-    public ArrayList<MantencionBaseHecha> getMantencionesPendientes(Connection p_conn) throws Exception {
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
+import org.joda.time.DateTime ;
+import org.joda.time.Months;
+
+
+import cl.dsoft.mobile.db.MantencionBaseHecha;
+import cl.dsoft.mobile.db.MantencionBase;
+import cl.dsoft.mobile.db.MantencionUsuarioHecha;
+import cl.dsoft.mobile.db.MantencionUsuario;
+
+
+    public ArrayList<MantencionBaseHecha> getMantencionesBasePendientes(Connection p_conn) throws Exception {
     	
     	ArrayList<MantencionBaseHecha> ret;
     	ArrayList<MantencionBase> list_mb;
     	ArrayList<AbstractMap.SimpleEntry<String, String>> parametros;
-    	Integer kmInicial = 0;
+    	Integer kmInicial;
+    	Date dInicial, dFinal;
+    	DateTime dtInicial, dtFinal;
     	String traccion, combustible;
     	
     	traccion = Traccion.getById(p_conn, this.getIdTraccion().toString()).getDescripcion();
@@ -180,39 +234,185 @@ Vehiculo
     		MantencionBaseHecha mbh; // = new MantencionBaseHecha();
     		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     		Integer n;
+            Boolean bFound = false;
+            
+    		// encuentro ultima mantencion hecha de este tipo
+    		parametros.clear();
     		
-    		if (mb.getDependeKm() && mb.getDiasEntreMantenciones() != null) {
+    		parametros.add(new AbstractMap.SimpleEntry<String, String>("id_mantencion_base", mb.getId().toString()));
     		
-	    		// encuentro ultima mantencion hecha de este tipo
-	    		parametros.clear();
-	    		
-	    		parametros.add(new AbstractMap.SimpleEntry<String, String>("id_mantencion_base", mb.getId().toString()));
-	    		
-	    		list_mbh = MantencionBaseHecha.seek(p_conn, parametros, "fecha", "DESC", 0, 1);
-	    		
-	    		if (list_mbh.size() > 0) {
-	    			kmInicial = list_mbh.get(0).getKm();
-	    		}
-	    		
+    		list_mbh = MantencionBaseHecha.seek(p_conn, parametros, "fecha", "DESC", 0, 1);
+    		
+			mbh = new MantencionBaseHecha();
+			
+			mbh.setIdMantencionBase(mb.getId());
+			mbh.setIdVehiculo(this.getIdVehiculo());
+			mbh.setIdUsuario(this.getIdUsuario());
+    		
+    			
+    		if (mb.getDependeKm() && mb.getKmEntreMantenciones() != null) {
+    			
+    			kmInicial = 0;
+    			
+    			if (list_mbh.size() > 0) {
+        			
+        			kmInicial = list_mbh.get(0).getKm();
+        		}
+
 	    		n = (this.getKm() - kmInicial) / mb.getKmEntreMantenciones();
 	    		
 	    		if (n > 0) {
 	    			// hay mantencion pendiente, o bien no la ha informado
-	    			mbh = new MantencionBaseHecha();
-	    			
-	    			mbh.setIdMantencionBase(mb.getId());
-	    			mbh.setVehiculoIdVehiculo(this.getIdVehiculo());
-	    			mbh.setVehiculoIdUsuario(this.getIdUsuario());
-	    			mbh.setKm(n * mb.getKmEntreMantenciones());
-	    			mbh.setFecha(formatter.format(new Date()));
+	    			mbh.setKm(kmInicial + n * mb.getKmEntreMantenciones());
+	    			//mbh.setFecha(formatter.format(new Date()));
 	    			
 	    			ret.add(mbh);
+	    			
+	    			bFound = true;
 	    		}
     		}
+
+    		if (!bFound && mb.getDiasEntreMantenciones() != null) {
+        		
+    			dInicial = new Date(0); // 1970-01-01
+    			dFinal = new Date(); // now
+    			
+    			dtInicial = new DateTime(dInicial);
+    			dtFinal = new DateTime(dFinal);
+    			
+    			if (list_mbh.size() > 0) {
+        			
+    				dInicial = list_mbh.get(0).getFechaAsDate();
+        		}
+    			
+    			Months d = Months.monthsBetween(dtFinal, dtInicial);
+	    		
+	    		n = d.getMonths() / mb.getDiasEntreMantenciones();
+	    		
+	    		if (n > 0) {
+	    			// hay mantencion pendiente, o bien no la ha informado
+	    			mbh.setFecha(dtInicial.plusMonths(n).toDate());
+	    			
+	    			ret.add(mbh);
+	    			
+	    			bFound = true;
+	    		}
+    		}
+
+    			
+    		
+
+    		
     		
     	}
     	
 		return ret;
     	
     }
+
+    public ArrayList<MantencionUsuarioHecha> getMantencionesUsuarioPendientes(Connection p_conn) throws Exception {
+    	
+    	ArrayList<MantencionUsuarioHecha> ret;
+    	ArrayList<MantencionUsuario> list_mu;
+    	ArrayList<AbstractMap.SimpleEntry<String, String>> parametros;
+    	Integer kmInicial;
+    	Date dInicial, dFinal;
+    	DateTime dtInicial, dtFinal;
+    	String traccion, combustible;
+    	
+    	traccion = Traccion.getById(p_conn, this.getIdTraccion().toString()).getDescripcion();
+    	combustible = Combustible.getById(p_conn, this.getIdCombustible().toString()).getDescripcion();
+    	
+    	parametros = new ArrayList<AbstractMap.SimpleEntry<String, String>>();
+    	
+    	ret = new ArrayList<MantencionUsuarioHecha>();
+    	
+    	parametros.add(new AbstractMap.SimpleEntry<String, String>("id_usuario", getIdUsuario().toString()));
+    	parametros.add(new AbstractMap.SimpleEntry<String, String>("id_vehiculo", getIdVehiculo().toString()));
+    	
+    	list_mu = MantencionUsuario.seek(p_conn, parametros, null, null, 0, 10000);
+    	
+    	for (MantencionUsuario mu : list_mu) {
+    		
+    		ArrayList<MantencionUsuarioHecha> list_muh;
+    		MantencionUsuarioHecha muh; // = new MantencionUsuarioHecha();
+    		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    		Integer n;
+            Boolean bFound = false;
+            
+    		// encuentro ultima mantencion hecha de este tipo
+    		parametros.clear();
+    		
+    		parametros.add(new AbstractMap.SimpleEntry<String, String>("id_mantencion_base", mu.getId().toString()));
+    		
+    		list_muh = MantencionUsuarioHecha.seek(p_conn, parametros, "fecha", "DESC", 0, 1);
+    		
+			muh = new MantencionUsuarioHecha();
+			
+			muh.setIdMantencionUsuario(mu.getIdMantencionUsuario());
+			muh.setIdVehiculo(this.getIdVehiculo());
+			muh.setIdUsuario(this.getIdUsuario());
+    		
+    			
+    		if (mu.getDependeKm() && mu.getKmEntreMantenciones() != null) {
+    			
+    			kmInicial = 0;
+    			
+    			if (list_muh.size() > 0) {
+        			
+        			kmInicial = list_muh.get(0).getKm();
+        		}
+
+	    		n = (this.getKm() - kmInicial) / mu.getKmEntreMantenciones();
+	    		
+	    		if (n > 0) {
+	    			// hay mantencion pendiente, o bien no la ha informado
+	    			muh.setKm(kmInicial + n * mu.getKmEntreMantenciones());
+	    			//muh.setFecha(formatter.format(new Date()));
+	    			
+	    			ret.add(muh);
+	    			
+	    			bFound = true;
+	    		}
+    		}
+
+    		if (!bFound && mu.getDiasEntreMantenciones() != null) {
+        		
+    			dInicial = new Date(0); // 1970-01-01
+    			dFinal = new Date(); // now
+    			
+    			dtInicial = new DateTime(dInicial);
+    			dtFinal = new DateTime(dFinal);
+    			
+    			if (list_muh.size() > 0) {
+        			
+    				dInicial = list_muh.get(0).getFechaAsDate();
+        		}
+    			
+    			Months d = Months.monthsBetween(dtFinal, dtInicial);
+	    		
+	    		n = d.getMonths() / mu.getDiasEntreMantenciones();
+	    		
+	    		if (n > 0) {
+	    			// hay mantencion pendiente, o bien no la ha informado
+	    			muh.setFecha(dtInicial.plusMonths(n).toDate());
+	    			
+	    			ret.add(muh);
+	    			
+	    			bFound = true;
+	    		}
+    		}
+
+    			
+    		
+
+    		
+    		
+    	}
+    	
+		return ret;
+    	
+    }
+
+
 
