@@ -113,7 +113,7 @@ public class GenericORM {
 		mapFunctionTypes.put("DATETIME", "String");
 		mapFunctionTypes.put("TIMESTAMP", "String");
 		mapFunctionTypes.put("BIT", "Boolean");
-		mapFunctionTypes.put("BOOLEAN", "Boolean");
+		mapFunctionTypes.put("BOOLEAN", "String");
 		mapFunctionTypes.put("DECIMAL", "Decimal");
 		mapFunctionTypes.put("DOUBLE", "Double");
 		mapFunctionTypes.put("FLOAT", "Float");
@@ -416,7 +416,7 @@ public class GenericORM {
     	        		output += columnName + "\\\" : \" + (_" + column.getMemberName() + " != null ? \"\\\"\" + _" + column.getMemberName() + " + \"\\\"\" : \"null\")";	    	        		
     	        		break;
     	        	default:
-    	        		throw new Exception("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
+    	        		throw new InvalidParameterException("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
     	        } // end switch
     	        
     	    }
@@ -558,7 +558,7 @@ public class GenericORM {
 		String output;
 		
 		output =
-	    	"    public static " + className + " getById(Connection p_conn, String p_id) throws Exception {\n" +
+	    	"    public static " + className + " getById(Connection p_conn, String p_id) throws SQLException {\n" +
 	    	"        return getByParameter(p_conn, \"id_" + tableName + "\", p_id);\n" +
 	    	"    }\n";
 		
@@ -1394,7 +1394,7 @@ public class GenericORM {
 		Boolean bFirst;
 		String output =
         	"    \n" +
-        	"    public static ArrayList<" + className + "> seek(Connection p_conn, ArrayList<AbstractMap.SimpleEntry<String, String>> p_parameters, String p_order, String p_direction, int p_offset, int p_limit) throws Exception {\n" +
+        	"    public static ArrayList<" + className + "> seek(Connection p_conn, ArrayList<AbstractMap.SimpleEntry<String, String>> p_parameters, String p_order, String p_direction, int p_offset, int p_limit) throws UnsupportedParameter, SQLException {\n" +
         	"        Statement stmt = null;\n" +
         	"        ResultSet rs = null;\n" +
         	"        String str_sql;\n" +
@@ -1501,7 +1501,7 @@ public class GenericORM {
 
 	    output +=
         	"                else {\n" +
-        	"                    throw new Exception(\"Parametro no soportado: \" + p.getKey());\n" +
+        	"                    throw new UnsupportedParameter(\"Parametro no soportado: \" + p.getKey());\n" +
 	        "                }\n" +
         	"            }\n" +
         	"                                \n" +
@@ -1549,7 +1549,7 @@ public class GenericORM {
         	"            \n" +
         	"            throw ex;\n" +
         	"        }\n" +
-        	"        catch (Exception ex) {\n" +
+        	"        catch (UnsupportedParameter ex) {\n" +
         	"            throw ex;\n" +
         	"        }\n" +
         	"        finally {\n" +
@@ -1683,7 +1683,26 @@ public class GenericORM {
 	        }
 	
 	        output += 
-	        	"\"));\n";
+	        	"\")";
+	        
+	        if (column.getBaseType().equals("BOOLEAN")) {
+	        	output +=
+	        		" != null ? p_rs.getString(\"";
+	        	
+		        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+		        	output += "id";
+		        }
+		        else {
+		        	output += columnName;
+		        }
+		        
+		        output +=
+		        	"\").equals(\"true\") : null";
+
+	        }
+	        
+	        output +=
+	        	");\n";
 	
 	    }
 	    
