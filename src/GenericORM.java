@@ -1468,7 +1468,7 @@ public class GenericORM {
 	        
 	        output += 
     	        	"if (p.getKey().equals(\"mas reciente\")) {\n" +
-            	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > \" + p.getValue());\n" +
+            	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > datetime('\" + p.getValue() + \"', 'localtime'));\n" +
             	    "                }\n";
 
 	    }
