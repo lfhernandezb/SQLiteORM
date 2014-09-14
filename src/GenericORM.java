@@ -291,7 +291,7 @@ public class GenericORM {
 	        if (mapPrimaryKeys.size() > 0) {
 	        	
 	        	for (Map.Entry<String, PrimaryKey> entry : mapPrimaryKeys.entrySet()) {
-	        		if (mapColumns.get(entry.getKey()).getIsAutoincrement() == "YES") {
+	        		if (mapColumns.get(entry.getKey()).getIsAutoincrement().equals("YES")) {
 	        			bFlag = true;
 	        		}
 	        		else if (!mapForeignKeys.containsKey(entry.getKey())) {
@@ -931,7 +931,7 @@ public class GenericORM {
         if (mapPrimaryKeys.size() > 0) {
         	
         	for (Map.Entry<String, PrimaryKey> entry : mapPrimaryKeys.entrySet()) {
-        		if (mapColumns.get(entry.getKey()).getIsAutoincrement() == "YES") {
+        		if (mapColumns.get(entry.getKey()).getIsAutoincrement().equals("YES")) {
         			bFlag = true;
         		}
         		else if (!mapForeignKeys.containsKey(entry.getKey())) {
@@ -968,7 +968,7 @@ public class GenericORM {
 	        Column column = entry.getValue();
 	        
 	        // no se insertan las llaves primarias autoincrementales
-	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement() == "YES") {
+	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement().equals("YES")) {
 	        	continue;
 	        }
 	        /*
@@ -1002,7 +1002,7 @@ public class GenericORM {
 	        Column column = entry.getValue();        	        
 	        
 	        // no se insertan las llaves primarias autoincrementales
-	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement() == "YES") {
+	        if (mapPrimaryKeys.containsKey(columnName) && column.getIsAutoincrement().equals("YES")) {
 	        	continue;
 	        }
 	        /*
@@ -1088,7 +1088,7 @@ public class GenericORM {
 	    if (mapPrimaryKeys.size() == 1) {
 	    	
 	    	for (Map.Entry<String, PrimaryKey> entry : mapPrimaryKeys.entrySet()) {
-	    		if (mapColumns.get(entry.getKey()).getIsAutoincrement() == "YES") {
+	    		if (mapColumns.get(entry.getKey()).getIsAutoincrement().equals("YES")) {
 	    			bFlag = true;
 	    		}
 	    	}
