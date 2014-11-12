@@ -220,6 +220,7 @@ public class GenericORM {
 				"import java.sql.Statement;\n" +
 				"import java.util.AbstractMap;\n" +
 				"import java.util.ArrayList;\n" +
+				"import cl.dsoft.UnsupportedParameterException;\n" +
 				"\n" +
 				getCustomImports() +
 				"\n" +
@@ -1394,7 +1395,7 @@ public class GenericORM {
 		Boolean bFirst;
 		String output =
         	"    \n" +
-        	"    public static ArrayList<" + className + "> seek(Connection p_conn, ArrayList<AbstractMap.SimpleEntry<String, String>> p_parameters, String p_order, String p_direction, int p_offset, int p_limit) throws UnsupportedParameter, SQLException {\n" +
+        	"    public static ArrayList<" + className + "> seek(Connection p_conn, ArrayList<AbstractMap.SimpleEntry<String, String>> p_parameters, String p_order, String p_direction, int p_offset, int p_limit) throws UnsupportedParameterException, SQLException {\n" +
         	"        Statement stmt = null;\n" +
         	"        ResultSet rs = null;\n" +
         	"        String str_sql;\n" +
@@ -1468,7 +1469,7 @@ public class GenericORM {
 	        
 	        output += 
     	        	"if (p.getKey().equals(\"mas reciente\")) {\n" +
-            	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > datetime('\" + p.getValue() + \"', 'localtime'));\n" +
+            	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > datetime('\" + p.getValue() + \"', 'localtime')\");\n" +
             	    "                }\n";
 
 	    }
@@ -1501,7 +1502,7 @@ public class GenericORM {
 
 	    output +=
         	"                else {\n" +
-        	"                    throw new UnsupportedParameter(\"Parametro no soportado: \" + p.getKey());\n" +
+        	"                    throw new UnsupportedParameterException(\"Parametro no soportado: \" + p.getKey());\n" +
 	        "                }\n" +
         	"            }\n" +
         	"                                \n" +
@@ -1549,7 +1550,7 @@ public class GenericORM {
         	"            \n" +
         	"            throw ex;\n" +
         	"        }\n" +
-        	"        catch (UnsupportedParameter ex) {\n" +
+        	"        catch (UnsupportedParameterException ex) {\n" +
         	"            throw ex;\n" +
         	"        }\n" +
         	"        finally {\n" +
