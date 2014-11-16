@@ -8,6 +8,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -220,7 +223,11 @@ public class GenericORM {
 				"import java.sql.Statement;\n" +
 				"import java.util.AbstractMap;\n" +
 				"import java.util.ArrayList;\n" +
-				"import cl.dsoft.UnsupportedParameterException;\n" +
+				"import java.util.Date;\n" +
+				"import java.text.SimpleDateFormat;\n" +
+				"import java.text.ParseException;\n" +
+				"\n" +
+				"import cl.dsoft.car.misc.UnsupportedParameterException;\n" +
 				"\n" +
 				getCustomImports() +
 				"\n" +
@@ -1440,19 +1447,23 @@ public class GenericORM {
 	        String columnName = entry.getKey();
 	        ForeignKey fk = entry.getValue();
 	        
-	        output += "                ";
+	        // agrego opcion solamente si no es parte de la llave primaria
+	        if (!mapPrimaryKeys.containsKey(columnName)) {
 	        
-	        if (!bFirst) {
-	        	bFirst = true;
-	        }
-	        else {
-	        	output += "else ";
-	        }
-	        
-	        output += 
-    	        	"if (p.getKey().equals(\"" + fk.getColumnName() + "\")) {\n" +
-            	    "                    array_clauses.add(\"" + tableShortAlias + "." + fk.getColumnName() + " = \" + p.getValue());\n" +
-            	    "                }\n";
+		        output += "                ";
+		        
+		        if (!bFirst) {
+		        	bFirst = true;
+		        }
+		        else {
+		        	output += "else ";
+		        }
+		        
+		        output += 
+	    	        	"if (p.getKey().equals(\"" + fk.getColumnName() + "\")) {\n" +
+	            	    "                    array_clauses.add(\"" + tableShortAlias + "." + fk.getColumnName() + " = \" + p.getValue());\n" +
+	            	    "                }\n";
+		        }
 
 	    }
         
@@ -1794,7 +1805,147 @@ public class GenericORM {
 	           	    
 	    }
 		
-		return output;
+	    // solamente para columnas tipo Date, setea desde long
+	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
+	    	
+	        String columnName = entry.getKey();
+	        Column column = entry.getValue();
+	        
+	        switch(column.getBaseType()) {
+	        	case "DATE":
+	    	        output +=
+	    	        	"    /**\n" +
+	    	    	    "     * @param _";
+
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " the _";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " to set as seconds from January 1, 1970, 00:00:00 GMT\n" +
+			        	"     */\n" +
+			        	"    public void set";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "Id";
+			        }
+			        else {
+			        	output += WordUtils.capitalize(column.getMemberName());
+			        }
+			        
+			        output +=
+			            "(long _timestamp) {\n" +
+			        	"        Date d;\n" +
+			        	"        SimpleDateFormat formatter = new SimpleDateFormat(\"yyyy-MM-dd\");\n" +
+			        	"\n" +
+			        	"        d = new Date((long)_timestamp*1000);\n" +
+			        	"\n" +
+			        	"        this._";
+		
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " = formatter.format(d);\n";
+			    
+			        output +=
+			            ";\n" +
+		        	    "    }\n";
+			        
+		        	break;
+	        	default:
+	        		
+	        } // end switch
+	        
+	    }
+
+	    // solamente para columnas tipo Date, setea desde java.util.Date
+	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
+	    	
+	        String columnName = entry.getKey();
+	        Column column = entry.getValue();
+	        
+	        switch(column.getBaseType()) {
+	        	case "DATE":
+	    	        output +=
+	    	        	"    /**\n" +
+	    	    	    "     * @param _";
+
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " the _";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " to set as java.util.Date\n" +
+			        	"     */\n" +
+			        	"    public void set";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "Id";
+			        }
+			        else {
+			        	output += WordUtils.capitalize(column.getMemberName());
+			        }
+			        
+			        output +=
+			            "(Date _fecha) {\n" +
+			        	"\n" +
+			        	"        SimpleDateFormat formatter = new SimpleDateFormat(\"yyyy-MM-dd\");\n" +
+			        	"\n" +
+			        	"        this._";
+		
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " = formatter.format(_fecha);\n";
+			    
+			        output +=
+			            ";\n" +
+		        	    "    }\n";
+			        
+		        	break;
+	        	default:
+	        		
+	        } // end switch
+	        
+	    }
+
+	    return output;
 	}
 	
 	private String getGetters(Map<String, Column> mapColumns, Map<String, PrimaryKey> mapPrimaryKeys) {
@@ -1843,6 +1994,120 @@ public class GenericORM {
 	        output +=
 	            ";\n" +
 	        	"    }\n";
+	        
+	    }
+	    
+	    // solamente para columnas tipo Date, retorna long
+	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
+	    	
+	        String columnName = entry.getKey();
+	        Column column = entry.getValue();
+	        
+	        switch(column.getBaseType()) {
+	        	case "DATE":
+		            output +=
+			        	"    /**\n" +
+			        	"     * @return the _";
+	
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " as seconds from January 1, 1970, 00:00:00 GMT\n" +
+			        	"     */\n" +
+			        	"    public long get";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "Id";
+			        }
+			        else {
+			        	output += WordUtils.capitalize(column.getMemberName());
+			        }
+			        
+			        output +=
+			            "AsLong() throws ParseException {\n" +
+			        	"        Date d;\n" +
+			        	"        SimpleDateFormat formatter = new SimpleDateFormat(\"yyyy-MM-dd\");\n" +
+			        	"\n" +
+			        	"        d = formatter.parse(_";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			        	");\n" +
+						"\n" +
+						"        return (long)d.getTime() / 1000L;\n" +
+			        	"    }\n";
+		        	break;
+	        	default:
+	        		
+	        } // end switch
+	        
+	    }
+
+	    // solamente para columnas tipo Date, retorna java.util.Date
+	    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
+	    	
+	        String columnName = entry.getKey();
+	        Column column = entry.getValue();
+	        
+	        switch(column.getBaseType()) {
+	        	case "DATE":
+		            output +=
+			        	"    /**\n" +
+			        	"     * @return the _";
+	
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			            " as Date\n" +
+			        	"     */\n" +
+			        	"    public Date get";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "Id";
+			        }
+			        else {
+			        	output += WordUtils.capitalize(column.getMemberName());
+			        }
+			        
+			        output +=
+			            "AsDate() throws ParseException {\n" +
+			        	"        Date d;\n" +
+			        	"        SimpleDateFormat formatter = new SimpleDateFormat(\"yyyy-MM-dd\");\n" +
+			        	"\n" +
+			        	"        d = formatter.parse(_";
+			        
+			        if (mapPrimaryKeys.size() == 1 && mapPrimaryKeys.containsKey(columnName)) {
+			        	output += "id";
+			        }
+			        else {
+			        	output += column.getMemberName();
+			        }
+			        
+			        output +=
+			        	");\n" +
+						"\n" +
+						"        return d;\n" +
+			        	"    }\n";
+		        	break;
+	        	default:
+	        		
+	        } // end switch
 	        
 	    }
 		
