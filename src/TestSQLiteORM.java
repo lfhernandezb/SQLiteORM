@@ -21,7 +21,13 @@ public class TestSQLiteORM {
 		try {
 			sqliteORM.init();
 			sqliteORM.generateClassFiles();
-		} catch (ClassNotFoundException | SQLException | IOException | NullPointerException e) {
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

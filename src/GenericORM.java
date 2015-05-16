@@ -1071,7 +1071,7 @@ public class GenericORM {
 	        		output += "\" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
 	        		break;
 	        	case "DATE":
-	        		output += "\" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
+	        		output += "\" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'utc')\" : \"" + value + "\")";
 	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
@@ -1236,7 +1236,7 @@ public class GenericORM {
 	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
 	        		break;
 	        	case "DATE":
-	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
+	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'utc')\" : \"" + value + "\")";
 	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
@@ -2183,9 +2183,11 @@ public class GenericORM {
 	        		output += tableShortAlias + "." + columnName;
 	        		break;
 	        	case "DATE":
+	        		output += "strftime('%Y-%m-%d', " + tableShortAlias + "." + columnName + ", 'utc')";
+	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
-	        		output += "strftime('%Y-%m-%d %H:%M:%S', " + tableShortAlias + "." + columnName + ")";
+	        		output += "strftime('%Y-%m-%d %H:%M:%S', " + tableShortAlias + "." + columnName + ", 'localtime')";
 	        		break;
 	        	default:
 	        		throw new UnsupportedDataTypeException("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
