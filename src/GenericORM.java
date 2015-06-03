@@ -8,19 +8,14 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.activation.UnsupportedDataTypeException;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.log4j.Logger;
-import org.ini4j.BasicMultiMap;
 import org.ini4j.InvalidFileFormatException;
-import org.ini4j.Profile.Section;
 import org.ini4j.Wini;
 
 /**
@@ -83,8 +78,8 @@ public class GenericORM {
 
 		OpenConnection();
 				
-		mapJavaTypes = new HashMap<String, String>();
-		mapFunctionTypes = new HashMap<String, String>();
+		mapJavaTypes = new LinkedHashMap<String, String>();
+		mapFunctionTypes = new LinkedHashMap<String, String>();
 		
 		mapJavaTypes.put("BIGINT", "Long");
 		mapJavaTypes.put("INT", "Integer");
@@ -131,15 +126,16 @@ public class GenericORM {
 		String    schemaPattern;
 		String    tableNamePattern;
 		String[]  types;
+		String    outputTrigger;
 		ResultSet rs;
 		
 		Map<String, Column> mapColumns;
 		Map<String, PrimaryKey> mapPrimaryKeys;
 		Map<String, ForeignKey> mapForeignKeys;
 		
-		mapColumns = new HashMap<String, Column>();
-		mapPrimaryKeys = new HashMap<String, PrimaryKey>();
-		mapForeignKeys = new HashMap<String, ForeignKey>();
+		mapColumns = new LinkedHashMap<String, Column>();
+		mapPrimaryKeys = new LinkedHashMap<String, PrimaryKey>();
+		mapForeignKeys = new LinkedHashMap<String, ForeignKey>();
 		
     	// obtengo las tablas del modelo
     	databaseMetaData = conn.getMetaData();
@@ -150,6 +146,7 @@ public class GenericORM {
 		types            = new String[1];
 		
 		types[0] = "TABLE";
+		outputTrigger = "";
 		
     	rs = databaseMetaData.getTables(catalog, schemaPattern, tableNamePattern, types);
 
@@ -185,9 +182,9 @@ public class GenericORM {
     	    //logger.debug("columns:");
     	    
     	    while(rsColumns.next()){
-    	        String columnName = rsColumns.getString(4);
+    	    	Column column = Column.fromRS(rsColumns);
     	        
-    	        mapColumns.put(columnName, Column.fromRS(rsColumns));
+    	        mapColumns.put(column.getColumnName(), column);
     	        /*
     	        if (tableName.equals("vehiculo")) {
     	        	logger.debug(Column.fromRS(rsColumns).toString());
@@ -557,7 +554,12 @@ public class GenericORM {
 	        //System.out.println(output);
 	        
 	        writeToFile(System.getProperty("output_dir") + "/" + className + ".java", output);
+	        
+	        outputTrigger += getTrigger(tableName, mapColumns, mapPrimaryKeys);
+	        
     	} // end while rs (tabla)
+    	
+    	writeToFile(System.getProperty("output_dir") + "/triggers.sql", outputTrigger);
 		
 	}
 	
@@ -939,28 +941,32 @@ public class GenericORM {
         if (mapPrimaryKeys.size() > 0) {
         	
         	for (Map.Entry<String, PrimaryKey> entry : mapPrimaryKeys.entrySet()) {
-        		if (mapColumns.get(entry.getKey()).getIsAutoincrement().equals("YES")) {
-        			bFlag = true;
-        		}
-        		else if (!mapForeignKeys.containsKey(entry.getKey())) {
-        			bFlag = false;
+        		
+        		if (!mapForeignKeys.containsKey(entry.getKey())) {
         			
-        			if (mapPrimaryKeys.size() == 1) {
-        				columnId = "id";
-        	        }
-        	        else {
-        	        	columnId = mapColumns.get(entry.getKey()).getMemberName();
+            		if (mapColumns.get(entry.getKey()).getIsAutoincrement().equals("YES")) {
+            			bFlag = true;
+            		}
+            		
+            		bFlag = false;
+
+            		if (mapPrimaryKeys.size() == 1) {
+            			columnId = "id";
+            		}
+            		else {
+            			columnId = mapColumns.get(entry.getKey()).getMemberName();
+            		}
+            		
+        	        if (!bFlag && !columnId.equals("")) {
+        	    	    
+        	        	output += 
+        	        		"        if (_" + columnId + " == null) {\n" +
+        	        		"            _" + columnId + " = getNextId(p_conn);\n" +
+        	        		"        }\n\n";
         	        }
         		}
         	}
 	        
-	        if (!bFlag && !columnId.equals("")) {
-	    	    
-	        	output += 
-	        		"        if (_" + columnId + " == null) {\n" +
-	        		"            _" + columnId + " = getNextId(p_conn);\n" +
-	        		"        }\n\n";
-	        }
         }
 		
 		output +=
@@ -1071,11 +1077,11 @@ public class GenericORM {
 	        		output += "\" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
 	        		break;
 	        	case "DATE":
-	        		output += "\" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'utc')\" : \"" + value + "\")";
+	        		output += "\" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"')\" : \"" + value + "\")";
 	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
-	        		output += "\" + (_" + column.getMemberName() + " != null ? \"datetime('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
+	        		output += "\" + (_" + column.getMemberName() + " != null ? \"datetime('\" + _" + column.getMemberName() + " + \"')\" : \"" + value + "\")";
 	        		break;
 	        	default:
 	        		throw new UnsupportedDataTypeException("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
@@ -1236,11 +1242,11 @@ public class GenericORM {
 	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"'\" + _" + column.getMemberName() + " + \"'\" : \"" + value + "\")";
 	        		break;
 	        	case "DATE":
-	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"', 'utc')\" : \"" + value + "\")";
+	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"date('\" + _" + column.getMemberName() + " + \"')\" : \"" + value + "\")";
 	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
-	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"datetime('\" + _" + column.getMemberName() + " + \"', 'localtime')\" : \"" + value + "\")";
+	        		output += columnName + " = \" + (_" + column.getMemberName() + " != null ? \"datetime('\" + _" + column.getMemberName() + " + \"')\" : \"" + value + "\")";
 	        		break;
 	        	default:
 	        		throw new UnsupportedDataTypeException("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
@@ -1480,7 +1486,7 @@ public class GenericORM {
 	        
 	        output += 
     	        	"if (p.getKey().equals(\"mas reciente\")) {\n" +
-            	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > datetime('\" + p.getValue() + \"', 'localtime')\");\n" +
+            	    "                    array_clauses.add(\"" + tableShortAlias + ".fecha_modificacion > datetime('\" + p.getValue() + \"')\");\n" +
             	    "                }\n";
 
 	    }
@@ -2183,11 +2189,11 @@ public class GenericORM {
 	        		output += tableShortAlias + "." + columnName;
 	        		break;
 	        	case "DATE":
-	        		output += "strftime('%Y-%m-%d', " + tableShortAlias + "." + columnName + ", 'utc')";
+	        		output += "strftime('%Y-%m-%d', " + tableShortAlias + "." + columnName + ")";
 	        		break;
 	        	case "DATETIME":
 	        	case "TIMESTAMP":
-	        		output += "strftime('%Y-%m-%d %H:%M:%S', " + tableShortAlias + "." + columnName + ", 'localtime')";
+	        		output += "strftime('%Y-%m-%d %H:%M:%S', " + tableShortAlias + "." + columnName + ")";
 	        		break;
 	        	default:
 	        		throw new UnsupportedDataTypeException("Tipo no soportado: " + column.getTypeName() + " columna: " + columnName);
@@ -2209,6 +2215,77 @@ public class GenericORM {
 				
 		return output;
 	}
+	
+	
+	public String getTrigger(String tableName, Map<String, Column> mapColumns, Map<String, PrimaryKey> mapPrimaryKeys) throws UnsupportedDataTypeException {
+		// TODO Auto-generated method stub
+		String output;
+		Boolean bFirst;
+		
+		output = "";
+		
+		if (mapColumns.containsKey("fecha_modificacion")) {
+			
+			output +=
+		    	"  -- actualiza 'fecha_modificacion' al actualizar cualquier columna de '" + tableName + "'\n" +
+		    	"  CREATE TRIGGER actualiza_" + tableName + "\n" +
+		    	"  BEFORE UPDATE OF\n";
+			
+		    bFirst =  false;
+		    
+		    for (Map.Entry<String, Column> entry : mapColumns.entrySet()) {
+		    	
+		        String columnName = entry.getKey();
+		        
+		        // no se incluyen las llaves primarias
+		        if (mapPrimaryKeys.containsKey(columnName) || columnName.equals("fecha_modificacion")) {
+		        	continue;
+		        }
+	
+		        if (!bFirst) {
+		        	bFirst = true;
+		        }
+		        else {
+		        	output += ",\n";
+		        }
+		        
+		        output += "    " + columnName;
+		        
+		    }
+		    
+		    output +=
+		    	"\n" +
+		    	"  ON " + tableName + " FOR EACH ROW\n" +
+	   	    	"  BEGIN\n" +
+	   	    	"    UPDATE " + tableName + "\n" +
+	   	    	"    SET fecha_modificacion = datetime('now', 'localtime')\n" +
+	   	    	"    WHERE\n";
+		    
+			bFirst = false;
+			
+		    for (Map.Entry<String, PrimaryKey> entry : mapPrimaryKeys.entrySet()) {
+		    	
+		        String columnName = entry.getKey();
+		        PrimaryKey pk = entry.getValue();
+		        
+		        if (!bFirst) {
+		        	bFirst = true;
+		        }
+		        else {
+		        	output += " AND\n";
+		        }
+	
+		        output += "    " + columnName + " = NEW." + columnName;
+		        
+		    }
+		
+		    output +=
+		    	";\n" +
+		        "  END;\n\n";
+		}
+	    
+		return output;
+	}	
 	
 	private String buildWhereSentence(
 			Map<String, Column> p_mapColumns,
